@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getUserHistory, AnalysisResult } from '../services/apiService';
 import {
     LayoutDashboard,
     FileText,
@@ -21,10 +22,31 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 type HistoryProps = {
     onNavigate: (screen: 'landing' | 'login' | 'signup' | 'dashboard' | 'processing' | 'results' | 'history' | 'settings') => void;
+    onSignOut: () => void;
 };
 
-export default function History({ onNavigate }: HistoryProps) {
+export default function History({ onNavigate, onSignOut }: HistoryProps) {
     const [activeNav, setActiveNav] = useState('history');
+    const [reviews, setReviews] = useState<AnalysisResult[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        fetchHistory();
+    }, []);
+
+    const fetchHistory = async () => {
+        try {
+            setIsLoading(true);
+            const result = await getUserHistory(10);
+            setReviews(result.analyses || []);
+        } catch (err: any) {
+            console.error('Failed to fetch history:', err);
+            setError('Failed to load history. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const navItems = [
         { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -43,61 +65,21 @@ export default function History({ onNavigate }: HistoryProps) {
         }
     };
 
-    const reviews = [
-        {
-            id: 1,
-            title: 'How to Build Better Habits',
-            platform: 'Blog',
-            score: 82,
-            date: '2026-02-04',
-            time: '2:30 PM',
-            wordCount: 1250
-        },
-        {
-            id: 2,
-            title: 'The Future of AI in Education',
-            platform: 'LinkedIn',
-            score: 88,
-            date: '2026-02-03',
-            time: '10:15 AM',
-            wordCount: 650
-        },
-        {
-            id: 3,
-            title: '5 Tips for Productive Remote Work',
-            platform: 'Medium',
-            score: 75,
-            date: '2026-02-01',
-            time: '4:45 PM',
-            wordCount: 890
-        },
-        {
-            id: 4,
-            title: 'Understanding Machine Learning Basics',
-            platform: 'Blog',
-            score: 91,
-            date: '2026-01-30',
-            time: '11:20 AM',
-            wordCount: 1800
-        },
-        {
-            id: 5,
-            title: 'Why Emotional Intelligence Matters',
-            platform: 'LinkedIn',
-            score: 79,
-            date: '2026-01-28',
-            time: '3:00 PM',
-            wordCount: 580
-        },
-    ];
+    // Calculate stats from real data
+    const averageScore = reviews.length > 0 
+        ? Math.round(reviews.reduce((acc, r) => acc + r.overallScore, 0) / reviews.length)
+        : 0;
+    
+    const trend = reviews.length >= 2 && reviews[0].overallScore > reviews[reviews.length - 1].overallScore ? 'up' : 'down';
+    const trendValue = reviews.length >= 2 
+        ? Math.abs(reviews[0].overallScore - reviews[reviews.length - 1].overallScore)
+        : 0;
 
-    const chartData = [
-        { date: 'Jan 28', score: 79 },
-        { date: 'Jan 30', score: 91 },
-        { date: 'Feb 01', score: 75 },
-        { date: 'Feb 03', score: 88 },
-        { date: 'Feb 04', score: 82 },
-    ];
+    // Prepare chart data from real reviews
+    const chartData = reviews.slice(0, 5).reverse().map((review) => ({
+        date: new Date(review.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        score: review.overallScore,
+    }));
 
     const getScoreColor = (score: number) => {
         if (score >= 80) return 'text-green-600';
@@ -111,9 +93,9 @@ export default function History({ onNavigate }: HistoryProps) {
         return 'bg-red-50';
     };
 
-    const averageScore = Math.round(reviews.reduce((acc, r) => acc + r.score, 0) / reviews.length);
-    const trend = reviews[0].score > reviews[reviews.length - 1].score ? 'up' : 'down';
-    const trendValue = Math.abs(reviews[0].score - reviews[reviews.length - 1].score);
+    const formatPlatform = (platform: string) => {
+        return platform.charAt(0).toUpperCase() + platform.slice(1);
+    };
 
     return (
         <>
@@ -186,7 +168,7 @@ export default function History({ onNavigate }: HistoryProps) {
                                     <Bell className="w-5 h-5 text-gray-600" />
                                     <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
                                 </button>
-                                <button className="flex items-center gap-2 hover:bg-gray-50 rounded-lg px-3 py-2 transition-colors">
+                                <button className="flex items-center gap-2 hover:bg-gray-50 rounded-lg px-3 py-2 transition-colors" onClick={onSignOut}>
                                     <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
                                         <User className="w-5 h-5 text-gray-600" />
                                     </div>
@@ -203,6 +185,35 @@ export default function History({ onNavigate }: HistoryProps) {
                             <p className="text-sm text-gray-600">Track your content quality over time</p>
                         </div>
 
+                        {error && (
+                            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                                {error}
+                            </div>
+                        )}
+
+                        {isLoading ? (
+                            <div className="flex items-center justify-center py-12">
+                                <div className="text-center">
+                                    <div className="w-12 h-12 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                    <p className="text-gray-600">Loading history...</p>
+                                </div>
+                            </div>
+                        ) : reviews.length === 0 ? (
+                            <div className="bg-white border border-[#E5E7EB] rounded-lg p-12 text-center">
+                                <HistoryIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                                <h3 className="text-lg font-semibold mb-2">No analysis history yet</h3>
+                                <p className="text-sm text-gray-600 mb-4">
+                                    Start analyzing content to see your history here
+                                </p>
+                                <button
+                                    onClick={() => onNavigate('dashboard')}
+                                    className="px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1d4ed8] transition-colors"
+                                >
+                                    Analyze Content
+                                </button>
+                            </div>
+                        ) : (
+                            <>
                         {/* Stats Cards */}
                         <div className="grid grid-cols-3 gap-6 mb-6">
                             <div className="bg-white border border-[#E5E7EB] rounded-lg p-6">
@@ -289,26 +300,36 @@ export default function History({ onNavigate }: HistoryProps) {
                                     </thead>
                                     <tbody className="divide-y divide-[#E5E7EB]">
                                         {reviews.map((review) => (
-                                            <tr key={review.id} className="hover:bg-gray-50 transition-colors">
+                                            <tr key={review.analysisId} className="hover:bg-gray-50 transition-colors">
                                                 <td className="px-6 py-4">
-                                                    <div className="font-medium text-sm">{review.title}</div>
+                                                    <div className="font-medium text-sm">
+                                                        {review.content.substring(0, 50)}...
+                                                    </div>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span className="text-sm text-gray-600">{review.platform}</span>
+                                                    <span className="text-sm text-gray-600">
+                                                        {formatPlatform(review.targetPlatform)}
+                                                    </span>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span className="text-sm text-gray-600">{review.wordCount.toLocaleString()}</span>
+                                                    <span className="text-sm text-gray-600">
+                                                        {review.metadata.contentLength}
+                                                    </span>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${getScoreBgColor(review.score)}`}>
-                                                        <span className={`font-bold ${getScoreColor(review.score)}`}>
-                                                            {review.score}
+                                                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${getScoreBgColor(review.overallScore)}`}>
+                                                        <span className={`font-bold ${getScoreColor(review.overallScore)}`}>
+                                                            {review.overallScore}
                                                         </span>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <div className="text-sm text-gray-600">{review.date}</div>
-                                                    <div className="text-xs text-gray-500">{review.time}</div>
+                                                    <div className="text-sm text-gray-600">
+                                                        {new Date(review.timestamp).toLocaleDateString()}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500">
+                                                        {new Date(review.timestamp).toLocaleTimeString()}
+                                                    </div>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-2">
@@ -320,7 +341,7 @@ export default function History({ onNavigate }: HistoryProps) {
                                                             <Eye className="w-4 h-4 text-gray-600" />
                                                         </button>
                                                         <button
-                                                            onClick={() => alert('Report would be downloaded as PDF')}
+                                                            onClick={() => alert('Export feature coming soon')}
                                                             className="p-1.5 hover:bg-gray-100 rounded transition-colors"
                                                             title="Download"
                                                         >
@@ -334,6 +355,8 @@ export default function History({ onNavigate }: HistoryProps) {
                                 </table>
                             </div>
                         </div>
+                        </>
+                        )}
                     </div>
                 </div>
             </div>

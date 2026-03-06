@@ -18,9 +18,10 @@ type DashboardProps = {
   onNavigate: (screen: 'landing' | 'login' | 'signup' | 'dashboard' | 'processing' | 'results' | 'history' | 'settings') => void;
   onStartAnalysis: (content: string, config: any) => void;
   initialContent?: string;
+  onSignOut: () => void;
 };
 
-export default function Dashboard({ onNavigate, onStartAnalysis, initialContent = '' }: DashboardProps) {
+export default function Dashboard({ onNavigate, onStartAnalysis, initialContent = '', onSignOut }: DashboardProps) {
   const [content, setContent] = useState(initialContent);
   const [platform, setPlatform] = useState('Blog');
   const [intent, setIntent] = useState('Inform');
@@ -30,7 +31,24 @@ export default function Dashboard({ onNavigate, onStartAnalysis, initialContent 
 
   const handleAnalyze = () => {
     if (content.trim().length > 0) {
-      onStartAnalysis(content, { platform, intent });
+      // Map UI values to API format
+      const platformMap: Record<string, 'blog' | 'linkedin' | 'twitter' | 'medium'> = {
+        'Blog': 'blog',
+        'LinkedIn': 'linkedin',
+        'Twitter': 'twitter',
+        'Medium': 'medium',
+      };
+
+      const intentMap: Record<string, 'inform' | 'educate' | 'persuade'> = {
+        'Inform': 'inform',
+        'Educate': 'educate',
+        'Persuade': 'persuade',
+      };
+
+      onStartAnalysis(content, {
+        targetPlatform: platformMap[platform] || 'blog',
+        contentIntent: intentMap[intent] || 'inform',
+      });
     }
   };
 
@@ -124,7 +142,7 @@ export default function Dashboard({ onNavigate, onStartAnalysis, initialContent 
                 <Bell className="w-5 h-5 text-gray-600" />
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
-              <button className="flex items-center gap-2 hover:bg-gray-50 rounded-lg px-3 py-2 transition-colors">
+              <button className="flex items-center gap-2 hover:bg-gray-50 rounded-lg px-3 py-2 transition-colors" onClick={onSignOut}>
                 <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
                   <User className="w-5 h-5 text-gray-600" />
                 </div>

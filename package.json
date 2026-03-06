@@ -12,15 +12,22 @@
     "deploy": "cdk deploy",
     "synth": "cdk synth"
   },
-  "keywords": ["aws", "lambda", "bedrock", "content-analysis"],
+  "keywords": [
+    "aws",
+    "lambda",
+    "bedrock",
+    "content-analysis"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@aws-amplify/ui-react": "^6.15.1",
     "@aws-sdk/client-bedrock-runtime": "^3.700.0",
     "@aws-sdk/client-comprehend": "^3.700.0",
     "@aws-sdk/client-dynamodb": "^3.700.0",
     "@aws-sdk/client-secrets-manager": "^3.700.0",
     "@aws-sdk/lib-dynamodb": "^3.700.0",
+    "aws-amplify": "^6.16.2",
     "aws-cdk-lib": "^2.170.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21",

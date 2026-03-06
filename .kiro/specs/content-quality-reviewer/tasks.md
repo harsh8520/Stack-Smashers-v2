@@ -188,20 +188,20 @@ This implementation plan focuses on building the serverless backend architecture
     - **Property 10: Comprehensive Feedback Generation**
     - **Validates: Requirements 5.1, 5.3, 5.4**
 
-- [ ] 11. Implement API endpoints
-  - [ ] 11.1 Implement POST /analyze endpoint
+- [-] 11. Implement API endpoints
+  - [x] 11.1 Implement POST /analyze endpoint
     - Wire API Gateway to orchestrator Lambda
     - Add request validation
     - Return analysis results with proper schema
     - _Requirements: 1.1, 6.1_
   
-  - [ ] 11.2 Implement GET /analysis/{id} endpoint
+  - [x] 11.2 Implement GET /analysis/{id} endpoint
     - Create Lambda handler for retrieval
     - Query DynamoDB by analysisId
     - Return stored analysis result
     - _Requirements: 8.3_
   
-  - [ ] 11.3 Implement GET /history endpoint
+  - [x] 11.3 Implement GET /history endpoint
     - Create Lambda handler for history queries
     - Query DynamoDB by userId with filters
     - Return paginated results

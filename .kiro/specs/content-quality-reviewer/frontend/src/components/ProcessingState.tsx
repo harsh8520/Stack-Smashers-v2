@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Loader2, Sparkles } from 'lucide-react';
+import { analyzeContent, AnalyzeRequest } from '../services/apiService';
 
 const steps = [
   { id: 1, label: 'Analyzing clarity and readability...', duration: 1000 },
@@ -8,10 +9,26 @@ const steps = [
   { id: 4, label: 'Assessing accessibility...', duration: 1000 },
 ];
 
-export default function ProcessingState() {
+type ProcessingStateProps = {
+  content: string;
+  config: {
+    targetPlatform: 'blog' | 'linkedin' | 'twitter' | 'medium';
+    contentIntent: 'inform' | 'educate' | 'persuade';
+  };
+  onComplete: (results: any) => void;
+  onError: (error: Error) => void;
+};
+
+export default function ProcessingState({ content, config, onComplete, onError }: ProcessingStateProps) {
   const [currentStep, setCurrentStep] = useState(0);
 
   useEffect(() => {
+    // Start the analysis immediately
+    performAnalysis();
+  }, []);
+
+  useEffect(() => {
+    // Animate through steps
     if (currentStep < steps.length - 1) {
       const timer = setTimeout(() => {
         setCurrentStep(currentStep + 1);
@@ -19,6 +36,26 @@ export default function ProcessingState() {
       return () => clearTimeout(timer);
     }
   }, [currentStep]);
+
+  const performAnalysis = async () => {
+    try {
+      const request: AnalyzeRequest = {
+        content,
+        targetPlatform: config.targetPlatform,
+        contentIntent: config.contentIntent,
+      };
+
+      const result = await analyzeContent(request);
+      
+      // Wait for animation to complete before showing results
+      setTimeout(() => {
+        onComplete(result);
+      }, steps.length * 1000);
+    } catch (error: any) {
+      console.error('Analysis failed:', error);
+      onError(error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-8">

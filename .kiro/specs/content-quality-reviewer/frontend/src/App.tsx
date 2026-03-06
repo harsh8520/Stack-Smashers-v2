@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getCurrentUser, signOut } from 'aws-amplify/auth';
 import LandingPage from './components/LandingPage';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
@@ -13,32 +14,73 @@ type Screen = 'landing' | 'login' | 'signup' | 'dashboard' | 'processing' | 'res
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
   const [contentToAnalyze, setContentToAnalyze] = useState('');
-  const [analysisConfig, setAnalysisConfig] = useState({
-    platform: 'Blog',
-    intent: 'Inform'
+  const [analysisConfig, setAnalysisConfig] = useState<{
+    targetPlatform: 'blog' | 'linkedin' | 'twitter' | 'medium';
+    contentIntent: 'inform' | 'educate' | 'persuade';
+  }>({
+    targetPlatform: 'blog',
+    contentIntent: 'inform'
   });
   const [analysisResults, setAnalysisResults] = useState<any>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  // Check authentication status on mount
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  const checkAuthStatus = async () => {
+    try {
+      await getCurrentUser();
+      setIsAuthenticated(true);
+    } catch (error) {
+      setIsAuthenticated(false);
+    } finally {
+      setIsCheckingAuth(false);
+    }
+  };
 
   const navigate = (screen: Screen) => {
+    // Protect authenticated routes
+    if (!isAuthenticated && ['dashboard', 'processing', 'results', 'history', 'settings'].includes(screen)) {
+      setCurrentScreen('login');
+      return;
+    }
     setCurrentScreen(screen);
+  };
+
+  const handleAuthSuccess = () => {
+    setIsAuthenticated(true);
+    setCurrentScreen('dashboard');
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      setIsAuthenticated(false);
+      setCurrentScreen('landing');
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
   };
 
   const startAnalysis = (content: string, config: any) => {
     setContentToAnalyze(content);
     setAnalysisConfig(config);
     setCurrentScreen('processing');
-    
-    // Simulate AI processing and generate results
-    setTimeout(() => {
-      const results = {
-        overallScore: Math.floor(Math.random() * 20) + 75, // 75-95
-        content: content,
-        config: config,
-        timestamp: new Date().toISOString()
-      };
-      setAnalysisResults(results);
-      setCurrentScreen('results');
-    }, 4000);
+    setAnalysisResults(null);
+  };
+
+  const handleAnalysisComplete = (results: any) => {
+    setAnalysisResults(results);
+    setCurrentScreen('results');
+  };
+
+  const handleAnalysisError = (error: Error) => {
+    console.error('Analysis error:', error);
+    alert(`Analysis failed: ${error.message}`);
+    setCurrentScreen('dashboard');
   };
 
   const editContent = () => {
@@ -47,21 +89,32 @@ export default function App() {
   };
 
   const renderScreen = () => {
+    if (isCheckingAuth) {
+      return (
+        <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      );
+    }
+
     switch (currentScreen) {
       case 'landing':
         return <LandingPage onNavigate={navigate} />;
       case 'login':
-        return <Login onNavigate={navigate} />;
+        return <Login onNavigate={navigate} onAuthSuccess={handleAuthSuccess} />;
       case 'signup':
-        return <SignUp onNavigate={navigate} />;
+        return <SignUp onNavigate={navigate} onAuthSuccess={handleAuthSuccess} />;
       case 'dashboard':
-        return <Dashboard onNavigate={navigate} onStartAnalysis={startAnalysis} initialContent={contentToAnalyze} />;
+        return <Dashboard onNavigate={navigate} onStartAnalysis={startAnalysis} initialContent={contentToAnalyze} onSignOut={handleSignOut} />;
       case 'processing':
-        return <ProcessingState />;
+        return <ProcessingState content={contentToAnalyze} config={analysisConfig} onComplete={handleAnalysisComplete} onError={handleAnalysisError} />;
       case 'results':
         return <ResultsDashboard onNavigate={navigate} content={contentToAnalyze} onEditContent={editContent} results={analysisResults} />;
       case 'history':
-        return <History onNavigate={navigate} />;
+        return <History onNavigate={navigate} onSignOut={handleSignOut} />;
       case 'settings':
         return <Settings onNavigate={navigate} />;
       default:
