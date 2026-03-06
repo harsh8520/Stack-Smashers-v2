@@ -26,7 +26,7 @@ graph TB
     Accessibility --> Comprehend
     Platform --> Rules[Platform Rules Engine]
     
-    Orchestrator --> Bedrock[Amazon Bedrock<br/>Claude 3 Sonnet]
+    Orchestrator --> Bedrock[Amazon Bedrock<br/>Amazon Nova Lite]
     Bedrock --> Orchestrator
     
     Orchestrator --> Feedback[Lambda: Feedback Generator]
@@ -54,7 +54,7 @@ graph TB
 **Timeout**: 30 seconds
 **Environment Variables**:
 ```
-BEDROCK_MODEL_ID=anthropic.claude-3-sonnet-20240229-v1:0
+BEDROCK_MODEL_ID=us.amazon.nova-lite-v1:0
 DYNAMODB_TABLE_NAME=ContentAnalysisResults
 COMPREHEND_REGION=us-east-1
 API_KEY_SECRET_NAME=content-reviewer/api-keys
@@ -290,10 +290,10 @@ interface AnalysisResult {
 ### Amazon Bedrock Integration (Lambda)
 **Purpose**: Interfaces with Amazon Bedrock to leverage advanced language models for content analysis.
 
-**Model Selection**: Claude 3 Sonnet (anthropic.claude-3-sonnet-20240229-v1:0)
-- Balanced performance and cost
+**Model Selection**: Amazon Nova Lite (us.amazon.nova-lite-v1:0)
+- Fast and cost-effective
 - Strong reasoning capabilities for content evaluation
-- Structured output support
+- Optimized for text generation tasks
 
 **Prompt Template Structure**:
 ```xml
@@ -358,11 +358,12 @@ Format your response as JSON:
 **Bedrock API Configuration**:
 ```typescript
 const bedrockConfig = {
-  modelId: 'anthropic.claude-3-sonnet-20240229-v1:0',
-  maxTokens: 4096,
-  temperature: 0.3, // Lower temperature for consistent analysis
-  topP: 0.9,
-  stopSequences: []
+  modelId: 'us.amazon.nova-lite-v1:0',
+  inferenceConfig: {
+    max_new_tokens: 4096,
+    temperature: 0.3, // Lower temperature for consistent analysis
+    top_p: 0.9,
+  },
 };
 ```
 
@@ -780,7 +781,7 @@ This comprehensive testing strategy ensures both concrete correctness (unit test
   - Projection: ALL
 
 **Amazon Bedrock**:
-- Model: Claude 3 Sonnet (anthropic.claude-3-sonnet-20240229-v1:0)
+- Model: Amazon Nova Lite (us.amazon.nova-lite-v1:0)
 - Region: us-east-1 (primary), us-west-2 (failover)
 - Model access: Enabled via AWS Console
 - Guardrails: Content filtering enabled
@@ -825,7 +826,7 @@ export class ContentReviewerStack extends Stack {
       memorySize: 1024,
       environment: {
         DYNAMODB_TABLE_NAME: analysisTable.tableName,
-        BEDROCK_MODEL_ID: 'anthropic.claude-3-sonnet-20240229-v1:0',
+        BEDROCK_MODEL_ID: 'us.amazon.nova-lite-v1:0',
       },
     });
 
@@ -874,9 +875,9 @@ export class ContentReviewerStack extends Stack {
 - Lambda: ~$5 (compute time)
 - API Gateway: ~$3.50 (API calls)
 - DynamoDB: ~$2 (on-demand reads/writes)
-- Bedrock: ~$30 (Claude 3 Sonnet usage)
+- Bedrock: ~$5-10 (Amazon Nova Lite usage)
 - CloudWatch: ~$5 (logs and metrics)
-- **Total: ~$45.50/month**
+- **Total: ~$15.50-20.50/month**
 
 **Cost reduction strategies**:
 - Use ARM64 Lambda architecture (20% cost reduction)

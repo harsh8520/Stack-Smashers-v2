@@ -48,7 +48,7 @@ Before testing, ensure you have:
    - Lambda
    - API Gateway
    - DynamoDB
-   - Bedrock (Claude 3 Sonnet access)
+   - Bedrock (Amazon Nova Lite access)
    - Comprehend
    - Secrets Manager
 
@@ -80,7 +80,7 @@ aws sts get-caller-identity
 
 1. Go to AWS Console → Amazon Bedrock
 2. Navigate to "Model access"
-3. Request access to "Claude 3 Sonnet"
+3. Request access to "Amazon Nova Lite" (or "Amazon Nova Pro" for higher quality)
 4. Wait for approval (usually instant)
 
 ### 4. Bootstrap CDK (First Time Only)
@@ -307,7 +307,7 @@ cdk bootstrap aws://ACCOUNT-ID/REGION
 
 **Solution:**
 1. Go to AWS Console → Bedrock → Model access
-2. Request access to Claude 3 Sonnet
+2. Request access to Amazon Nova Lite (or Nova Pro)
 3. Wait for approval
 
 ### Issue 3: Lambda Timeout

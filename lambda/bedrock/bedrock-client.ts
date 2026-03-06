@@ -10,7 +10,7 @@ const client = new BedrockRuntimeClient({
   region: process.env.AWS_REGION || 'us-east-1',
 });
 
-const MODEL_ID = process.env.BEDROCK_MODEL_ID || 'anthropic.claude-3-sonnet-20240229-v1:0';
+const MODEL_ID = process.env.BEDROCK_MODEL_ID || 'us.amazon.nova-lite-v1:0';
 const TIMEOUT_MS = parseInt(process.env.ANALYSIS_TIMEOUT_MS || '25000', 10);
 const MAX_RETRIES = 2;
 
@@ -73,20 +73,25 @@ async function invokeModelWithTimeout(prompt: string, timeoutMs: number): Promis
 }
 
 /**
- * Invokes Bedrock model
+ * Invokes Bedrock model (Amazon Nova)
  */
 async function invokeModel(prompt: string): Promise<BedrockResponse> {
   const requestBody = {
-    anthropic_version: 'bedrock-2023-05-31',
-    max_tokens: 4096,
-    temperature: 0.3,
-    top_p: 0.9,
     messages: [
       {
         role: 'user',
-        content: prompt,
+        content: [
+          {
+            text: prompt,
+          },
+        ],
       },
     ],
+    inferenceConfig: {
+      max_new_tokens: 4096,
+      temperature: 0.3,
+      top_p: 0.9,
+    },
   };
 
   const commandInput: InvokeModelCommandInput = {
@@ -105,8 +110,8 @@ async function invokeModel(prompt: string): Promise<BedrockResponse> {
 
   const responseBody = JSON.parse(new TextDecoder().decode(response.body));
   
-  // Extract content from Claude response
-  const content = responseBody.content?.[0]?.text;
+  // Extract content from Nova response
+  const content = responseBody.output?.message?.content?.[0]?.text;
   
   if (!content) {
     throw new Error('No content in Bedrock response');
@@ -120,7 +125,7 @@ async function invokeModel(prompt: string): Promise<BedrockResponse> {
  */
 export function parseBedrockResponse(content: string): BedrockResponse {
   try {
-    // Extract JSON from response (Claude might wrap it in markdown)
+    // Extract JSON from response (Nova might wrap it in markdown)
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new ValidationError('No JSON found in response');

@@ -1,272 +1,250 @@
-# Content Quality Reviewer Backend
+# AI-Powered Content Quality Reviewer
 
-AI-powered Content Quality Reviewer built with Node.js, AWS Lambda, Amazon Bedrock, and DynamoDB.
+An intelligent content analysis system that helps student creators improve their digital content quality before publishing. Built with AWS serverless architecture, Amazon Bedrock (Nova Sonic), and React.
+
+## 🏗️ Architecture
+
+- **Frontend**: React + Vite + AWS Amplify
+- **Backend**: AWS Lambda + API Gateway (REST)
+- **Authentication**: Amazon Cognito
+- **AI Analysis**: Amazon Bedrock (Nova Sonic)
+- **Database**: Amazon DynamoDB
+- **NLP**: Amazon Comprehend
+- **Deployment**: AWS CDK + Amplify Hosting
+
+## ✨ Features
+
+- **Multi-Dimensional Analysis**
+  - Structure & Organization
+  - Tone & Voice
+  - Accessibility & Readability
+  - Platform-Specific Optimization
+
+- **AI-Powered Insights**
+  - Amazon Nova Sonic for fast, cost-effective analysis
+  - AWS Comprehend for sentiment and NLP
+  - Custom analyzers for detailed feedback
+
+- **Platform Support**
+  - Blog posts
+  - LinkedIn articles
+  - Twitter/X posts
+  - Medium stories
+
+- **User Features**
+  - Secure authentication with Cognito
+  - Analysis history tracking
+  - Real-time feedback
+  - Actionable suggestions
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+
+- AWS Account with appropriate permissions
 - Node.js 20.x or later
 - AWS CLI configured
-- AWS CDK CLI (`npm install -g aws-cdk`)
-- AWS Account with Bedrock access
+- AWS CDK CLI installed
 
-### Installation
+### 1. Clone and Install
+
+```bash
+git clone <repository-url>
+cd content-quality-reviewer
+npm install
+```
+
+### 2. Deploy Backend
+
+```bash
+# Make deploy script executable (Linux/Mac)
+chmod +x deploy.sh
+
+# Run deployment
+./deploy.sh
+
+# Or manually:
+npm install
+cdk bootstrap
+cdk deploy
+```
+
+### 3. Enable Bedrock Access
+
+1. Go to AWS Console → Amazon Bedrock
+2. Navigate to "Model access"
+3. Enable **Amazon Nova Sonic** (us.amazon.nova-sonic-v1:0)
+4. Wait for approval (usually instant)
+
+### 4. Configure Frontend
+
+```bash
+cd .kiro/specs/content-quality-reviewer/frontend
+npm install
+
+# Create aws-exports.js with values from CDK output
+# See IMPLEMENTATION_GUIDE.md for details
+```
+
+### 5. Deploy Frontend
+
+```bash
+# Option 1: Deploy to Amplify
+amplify init
+amplify add hosting
+amplify publish
+
+# Option 2: Run locally
+npm run dev
+```
+
+## 📖 Documentation
+
+- **[IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)** - Complete step-by-step setup guide
+- **[TESTING_GUIDE.md](./TESTING_GUIDE.md)** - Testing strategies and examples
+- **[NOVA_MIGRATION.md](./NOVA_MIGRATION.md)** - Nova model migration notes
+- **[PROJECT_STATUS_ANALYSIS.md](./PROJECT_STATUS_ANALYSIS.md)** - Current project status
+
+## 🏛️ Project Structure
+
+```
+content-quality-reviewer/
+├── lambda/                      # Lambda function code
+│   ├── analyzers/              # Content analyzers
+│   │   ├── structure-analyzer.ts
+│   │   ├── tone-analyzer.ts
+│   │   ├── accessibility-checker.ts
+│   │   └── platform-adapter.ts
+│   ├── orchestrator/           # Main orchestrator
+│   │   └── handler.ts
+│   ├── bedrock/                # Bedrock integration
+│   │   ├── bedrock-client.ts
+│   │   ├── prompt-template.ts
+│   │   └── error-handler.ts
+│   ├── comprehend/             # Comprehend integration
+│   │   └── comprehend-service.ts
+│   ├── storage/                # DynamoDB operations
+│   │   ├── storage-service.ts
+│   │   └── types.ts
+│   └── auth/                   # Authentication
+│       └── handler.ts
+├── lib/                        # CDK infrastructure
+│   ├── cdk-app.ts
+│   └── content-reviewer-stack.ts
+├── test/                       # Unit tests
+│   └── storage-service.test.ts
+├── .kiro/specs/                # Spec documents
+│   └── content-quality-reviewer/
+│       ├── requirements.md
+│       ├── design.md
+│       ├── tasks.md
+│       └── frontend/           # React frontend
+├── deploy.sh                   # Deployment script
+└── IMPLEMENTATION_GUIDE.md     # Complete setup guide
+```
+
+## 🧪 Testing
+
+```bash
+# Run unit tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run specific test file
+npm test storage-service.test.ts
+```
+
+## 📊 Cost Estimation
+
+Monthly costs for 1,000 analyses:
+
+- Lambda: ~$5
+- API Gateway: ~$3.50
+- DynamoDB: ~$2
+- Bedrock (Nova Sonic): ~$3-5
+- Cognito: Free (up to 50K MAUs)
+- Amplify: ~$0.15/GB
+- CloudWatch: ~$5
+
+**Total: ~$18-20/month**
+
+## 🔒 Security
+
+- Cognito user authentication
+- API Gateway authorization
+- DynamoDB encryption at rest
+- Secrets Manager for API keys
+- IAM least-privilege policies
+- CloudWatch audit logging
+
+## 🛠️ Development
+
+### Local Development
 
 ```bash
 # Install dependencies
 npm install
 
-# Bootstrap CDK (first time only)
-cdk bootstrap
+# Run tests
+npm test
+
+# Synthesize CloudFormation
+cdk synth
 
 # Deploy to AWS
-npm run deploy
+cdk deploy
 ```
 
-### Testing
+### Environment Variables
 
-```bash
-# Run unit tests (no AWS required)
-npm test
+Backend (Lambda):
+- `BEDROCK_MODEL_ID`: us.amazon.nova-sonic-v1:0
+- `DYNAMODB_TABLE_NAME`: ContentAnalysisResults
+- `COMPREHEND_REGION`: us-east-1
+- `MAX_CONTENT_LENGTH`: 2000
+- `ANALYSIS_TIMEOUT_MS`: 25000
 
-# Run tests with coverage
-npm test -- --coverage
-```
-
-For detailed testing instructions, see [TESTING_GUIDE.md](./TESTING_GUIDE.md)
-
-## 📋 What's Been Built
-
-✅ **Infrastructure** - CDK stack with API Gateway, Lambda, DynamoDB  
-✅ **Authentication** - API key auth with rate limiting (10 req/min)  
-✅ **Storage** - DynamoDB service for analysis results and history  
-✅ **Bedrock Integration** - Claude 3 Sonnet with retry logic  
-✅ **Comprehend Integration** - Sentiment, key phrases, syntax analysis  
-
-🚧 **In Progress** - Content analyzers, orchestrator, API endpoints  
-⏳ **Pending** - Frontend integration, deployment scripts
-
-## 🏗️ Project Structure
-
-```
-.
-├── lambda/           # Lambda function handlers
-│   ├── auth/        # Authentication handler
-│   ├── storage/     # DynamoDB storage service
-│   ├── bedrock/     # Bedrock AI integration
-│   └── comprehend/  # AWS Comprehend service
-├── lib/              # CDK infrastructure code
-│   ├── cdk-app.ts
-│   └── content-reviewer-stack.ts
-├── test/             # Unit and property-based tests
-├── package.json      # Node.js dependencies
-├── tsconfig.json     # TypeScript configuration
-├── cdk.json          # CDK configuration
-└── jest.config.js    # Jest test configuration
-```
-
-## Prerequisites
-
-- Node.js 20.x or later
-- AWS CLI configured with appropriate credentials
-- AWS CDK CLI (`npm install -g aws-cdk`)
-
-## Installation
-
-```bash
-npm install
-```
-
-## Development
-
-Build TypeScript:
-```bash
-npm run build
-```
-
-Watch mode:
-```bash
-npm run watch
-```
-
-Run tests:
-```bash
-npm test
-```
-
-Run tests in watch mode:
-```bash
-npm run test:watch
-```
-
-## 🧪 Testing
-
-### Unit Tests (No AWS Required)
-```bash
-npm test
-```
-
-Tests the following with mocked AWS services:
-- Storage service (DynamoDB operations)
-- Prompt template construction
-- Input validation
-- Error handling
-
-### Integration Tests (Requires AWS)
-```bash
-# Deploy to AWS first
-npm run deploy
-
-# Test with real AWS services
-# See TESTING_GUIDE.md for detailed instructions
-```
-
-## 📦 Deployment
-
-### Development Environment
-
-```bash
-# Synthesize CloudFormation template
-npm run synth
-
-# Deploy to AWS
-npm run deploy
-```
-
-### Configure API Keys
-
-After deployment, add API keys to Secrets Manager:
-
-```bash
-aws secretsmanager put-secret-value \
-  --secret-id content-reviewer/api-keys \
-  --secret-string '{"keys":["your-api-key-here"]}'
-```
-
-### Test the API
-
-```bash
-# Get API endpoint from CDK outputs
-API_ENDPOINT="https://xxxxx.execute-api.us-east-1.amazonaws.com/prod"
-
-# Test analysis endpoint
-curl -X POST $API_ENDPOINT/analyze \
-  -H "x-api-key: your-api-key-here" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "content": "Your content here",
-    "targetPlatform": "blog",
-    "contentIntent": "inform"
-  }'
-```
-
-## Environment Variables
-
-The following environment variables are configured for Lambda functions:
-
-- `BEDROCK_MODEL_ID`: Claude 3 Sonnet model identifier
-- `DYNAMODB_TABLE_NAME`: DynamoDB table for analysis results
-- `COMPREHEND_REGION`: AWS region for Comprehend service
-- `API_KEY_SECRET_NAME`: Secrets Manager secret name for API keys
-- `MAX_CONTENT_LENGTH`: Maximum content length in words (2000)
-- `ANALYSIS_TIMEOUT_MS`: Analysis timeout in milliseconds (25000)
-
-## Architecture
-
-The system uses a serverless architecture with:
-
-- **API Gateway**: RESTful API endpoints with API key authentication
-- **Lambda Functions**: Serverless compute for analysis logic
-- **Amazon Bedrock**: AI-powered content analysis using Claude 3 Sonnet
-- **AWS Comprehend**: NLP services for sentiment and syntax analysis
-- **DynamoDB**: Persistent storage for analysis results (90-day TTL)
-- **Secrets Manager**: Secure API key storage
-
-### Key Features
-
-- ✅ API key authentication with rate limiting (10 req/min)
-- ✅ Automatic retry logic with exponential backoff
-- ✅ Fallback to Comprehend when Bedrock unavailable
-- ✅ 25-second timeout protection
-- ✅ Comprehensive error handling
-- ✅ CloudWatch logging and monitoring
-- ✅ 90-day data retention with automatic cleanup
-
-## 📊 Monitoring
-
-### View Logs
-
-```bash
-# List Lambda functions
-aws lambda list-functions --query 'Functions[?starts_with(FunctionName, `ContentReviewer`)].FunctionName'
-
-# Tail logs
-aws logs tail /aws/lambda/ContentReviewerStack-AuthFunction --follow
-```
-
-### Check DynamoDB
-
-```bash
-# View analysis results
-aws dynamodb scan --table-name ContentAnalysisResults --max-items 5
-
-# View rate limits
-aws dynamodb scan --table-name ContentReviewerRateLimits --max-items 5
-```
+Frontend (.env):
+- `VITE_AWS_REGION`: us-east-1
+- `VITE_USER_POOL_ID`: <from CDK output>
+- `VITE_USER_POOL_CLIENT_ID`: <from CDK output>
+- `VITE_API_ENDPOINT`: <from CDK output>
 
 ## 🐛 Troubleshooting
 
 ### Bedrock Access Denied
-1. Go to AWS Console → Bedrock → Model access
-2. Request access to Claude 3 Sonnet
-3. Wait for approval (usually instant)
+- Ensure model access is enabled in Bedrock console
+- Verify IAM permissions include `bedrock:InvokeModel`
+
+### Cognito Authentication Fails
+- Check User Pool ID and Client ID in aws-exports.js
+- Verify CORS settings in API Gateway
+- Ensure Authorization header format is correct
 
 ### Lambda Timeout
-- Bedrock calls can take 10-20 seconds
-- Current timeout: 30 seconds
-- Adjust in `lib/content-reviewer-stack.ts` if needed
+- Increase timeout in CDK (currently 30s)
+- Consider using Nova Sonic for faster responses
+- Optimize content length
 
-### Rate Limiting
-- Current limit: 10 requests per minute per API key
-- Wait 60 seconds between bursts
-- Adjust in CDK stack if needed
+See [IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md) for more troubleshooting tips.
 
-For more troubleshooting, see [TESTING_GUIDE.md](./TESTING_GUIDE.md)
+## 📝 License
 
-## 💰 Cost Estimates
+This project is licensed under the MIT License.
 
-Estimated AWS costs for 1000 analyses:
+## 🤝 Contributing
 
-- Lambda: ~$0.20
-- API Gateway: ~$3.50
-- DynamoDB: ~$1.25
-- Bedrock (Claude 3 Sonnet): ~$3-5
-- Comprehend: ~$0.10
+Contributions are welcome! Please read the contributing guidelines before submitting PRs.
 
-**Total: ~$8-10 per 1000 analyses**
+## 📞 Support
 
-## 🧹 Clean Up
+For issues or questions:
+1. Check CloudWatch logs
+2. Review [IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)
+3. Open an issue on GitHub
 
-To avoid ongoing costs:
+---
 
-```bash
-# Destroy all resources
-cdk destroy
-
-# Delete retained DynamoDB tables (if needed)
-aws dynamodb delete-table --table-name ContentAnalysisResults
-```
-
-## Testing
-
-The project uses:
-
-- **Jest**: Unit testing framework
-- **fast-check**: Property-based testing library
-- **ts-jest**: TypeScript support for Jest
-
-Test coverage target: 90% for all metrics (branches, functions, lines, statements)
-
-## License
-
-MIT
+**Built with ❤️ using AWS Serverless, Amazon Bedrock, and React**

@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as logs from 'aws-cdk-lib/aws-logs';
@@ -67,7 +68,7 @@ export class ContentReviewerStack extends cdk.Stack {
 
     // Common Lambda environment variables
     const commonEnvironment = {
-      BEDROCK_MODEL_ID: 'anthropic.claude-3-sonnet-20240229-v1:0',
+      BEDROCK_MODEL_ID: 'us.amazon.nova-sonic-v1:0', // Using Nova Sonic for faster, cheaper analysis
       DYNAMODB_TABLE_NAME: analysisTable.tableName,
       COMPREHEND_REGION: this.region,
       API_KEY_SECRET_NAME: apiKeySecret.secretName,
@@ -86,6 +87,41 @@ export class ContentReviewerStack extends cdk.Stack {
         'comprehend:DetectSyntax',
       ],
       resources: ['*'],
+    });
+
+    // ============================================
+    // Cognito User Pool for Authentication
+    // ============================================
+    const userPool = new cognito.UserPool(this, 'ContentReviewerUserPool', {
+      userPoolName: 'content-reviewer-users',
+      selfSignUpEnabled: true,
+      signInAliases: {
+        email: true,
+      },
+      autoVerify: {
+        email: true,
+      },
+      passwordPolicy: {
+        minLength: 8,
+        requireLowercase: true,
+        requireUppercase: true,
+        requireDigits: true,
+        requireSymbols: false,
+      },
+      accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
+    });
+
+    // User Pool Client for frontend
+    const userPoolClient = userPool.addClient('ContentReviewerClient', {
+      userPoolClientName: 'content-reviewer-web-client',
+      authFlows: {
+        userPassword: true,
+        userSrp: true,
+        custom: true,
+      },
+      generateSecret: false,
+      preventUserExistenceErrors: true,
     });
 
     // Authentication Lambda Function
@@ -107,17 +143,19 @@ export class ContentReviewerStack extends cdk.Stack {
     rateLimitTable.grantReadWriteData(authFunction);
 
     // Create Lambda authorizer
-    const authorizer = new apigateway.TokenAuthorizer(this, 'ApiAuthorizer', {
-      handler: authFunction,
-      identitySource: 'method.request.header.x-api-key',
-      authorizerName: 'ContentReviewerAuthorizer',
-      resultsCacheTtl: cdk.Duration.minutes(5),
-    });
+    // const authorizer = new apigateway.TokenAuthorizer(this, 'ApiAuthorizer', {
+    //   handler: authFunction,
+    //   identitySource: 'method.request.header.x-api-key',
+    //   authorizerName: 'ContentReviewerAuthorizer',
+    //   resultsCacheTtl: cdk.Duration.minutes(5),
+    // });
 
-    // API Gateway with API Key authentication and rate limiting
+    // ============================================
+    // API Gateway with Cognito Authorization
+    // ============================================
     const api = new apigateway.RestApi(this, 'ContentReviewerApi', {
       restApiName: 'Content Quality Reviewer API',
-      description: 'API for AI-powered content quality analysis',
+      description: 'API for AI-powered content quality analysis with Cognito auth',
       deployOptions: {
         stageName: 'prod',
         loggingLevel: apigateway.MethodLoggingLevel.INFO,
@@ -138,6 +176,13 @@ export class ContentReviewerStack extends cdk.Stack {
         ],
       },
       apiKeySourceType: apigateway.ApiKeySourceType.HEADER,
+    });
+
+    // Create Cognito Authorizer
+    const cognitoAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(this, 'CognitoAuthorizer', {
+      cognitoUserPools: [userPool],
+      authorizerName: 'ContentReviewerCognitoAuthorizer',
+      identitySource: 'method.request.header.Authorization',
     });
 
     // Create API Key
@@ -169,8 +214,40 @@ export class ContentReviewerStack extends cdk.Stack {
     // Associate API key with usage plan
     usagePlan.addApiKey(apiKey);
 
-    // Lambda function placeholders (to be implemented in subsequent tasks)
-    // These will be created in tasks 2-13
+    // Analysis Orchestrator Lambda Function
+    const orchestratorFunction = new lambda.Function(this, 'OrchestratorFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'handler.handler',
+      code: lambda.Code.fromAsset('lambda/orchestrator'),
+      environment: commonEnvironment,
+      timeout: cdk.Duration.seconds(30),
+      memorySize: 1024,
+      logRetention: logs.RetentionDays.ONE_MONTH,
+    });
+
+    // Grant permissions to orchestrator function
+    analysisTable.grantReadWriteData(orchestratorFunction);
+    orchestratorFunction.addToRolePolicy(aiServicesPolicy);
+
+    // POST /analyze endpoint with Cognito authorization
+    const analyzeResource = api.root.addResource('analyze');
+    analyzeResource.addMethod('POST', new apigateway.LambdaIntegration(orchestratorFunction), {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    // GET /analysis/{id} endpoint (placeholder for task 11.2)
+    const analysisResource = api.root.addResource('analysis');
+    const analysisIdResource = analysisResource.addResource('{id}');
+    // analysisIdResource.addMethod('GET', new apigateway.LambdaIntegration(getAnalysisFunction), {
+    //   apiKeyRequired: true,
+    // });
+
+    // GET /history endpoint (placeholder for task 11.3)
+    const historyResource = api.root.addResource('history');
+    // historyResource.addMethod('GET', new apigateway.LambdaIntegration(historyFunction), {
+    //   apiKeyRequired: true,
+    // });
 
     // Outputs
     new cdk.CfnOutput(this, 'ApiEndpoint', {
@@ -178,9 +255,24 @@ export class ContentReviewerStack extends cdk.Stack {
       description: 'API Gateway endpoint URL',
     });
 
+    new cdk.CfnOutput(this, 'UserPoolId', {
+      value: userPool.userPoolId,
+      description: 'Cognito User Pool ID',
+    });
+
+    new cdk.CfnOutput(this, 'UserPoolClientId', {
+      value: userPoolClient.userPoolClientId,
+      description: 'Cognito User Pool Client ID',
+    });
+
+    new cdk.CfnOutput(this, 'Region', {
+      value: this.region,
+      description: 'AWS Region',
+    });
+
     new cdk.CfnOutput(this, 'ApiKeyId', {
       value: apiKey.keyId,
-      description: 'API Key ID',
+      description: 'API Key ID (for backward compatibility)',
     });
 
     new cdk.CfnOutput(this, 'TableName', {
