@@ -68,7 +68,7 @@ export class ContentReviewerStack extends cdk.Stack {
 
         // Common Lambda environment variables
         const commonEnvironment = {
-            BEDROCK_MODEL_ID: 'us.amazon.nova-sonic-v1:0', // Using Nova Sonic for faster, cheaper analysis
+            BEDROCK_MODEL_ID: 'us.amazon.nova-2-lite-v1:0', // Using Nova 2 Lite for fast, cost-effective text analysis
             DYNAMODB_TABLE_NAME: analysisTable.tableName,
             COMPREHEND_REGION: this.region,
             API_KEY_SECRET_NAME: apiKeySecret.secretName,
@@ -212,7 +212,7 @@ export class ContentReviewerStack extends cdk.Stack {
         // Analysis Orchestrator Lambda Function
         const orchestratorFunction = new lambda.Function(this, 'OrchestratorFunction', {
             runtime: lambda.Runtime.NODEJS_20_X,
-            handler: 'handler.handler',
+            handler: 'orchestrator/handler.handler',
             code: lambda.Code.fromAsset('lambda/orchestrator'),
             environment: commonEnvironment,
             timeout: cdk.Duration.seconds(30),

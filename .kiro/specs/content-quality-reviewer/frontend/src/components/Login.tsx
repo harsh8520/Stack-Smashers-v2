@@ -22,8 +22,17 @@ export default function Login({ onNavigate, onAuthSuccess }: LoginProps) {
     setError('');
     setIsLoading(true);
 
+    console.log('Login attempt started for:', email);
+    console.log('Cognito config:', {
+      userPoolId: import.meta.env.VITE_USER_POOL_ID,
+      userPoolClientId: import.meta.env.VITE_USER_POOL_CLIENT_ID,
+      region: import.meta.env.VITE_AWS_REGION,
+    });
+
     try {
-      await signIn({ username: email, password });
+      console.log('Calling signIn...');
+      const result = await signIn({ username: email, password });
+      console.log('SignIn successful:', result);
       onAuthSuccess();
     } catch (err: any) {
       console.error('Login error:', err);

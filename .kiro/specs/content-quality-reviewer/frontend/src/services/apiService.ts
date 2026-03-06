@@ -133,7 +133,7 @@ export async function getAnalysisById(analysisId: string): Promise<AnalysisResul
     const result = await response.json();
     return result as AnalysisResult;
   } catch (error: any) {
-    console.error('Fetch analysis error:', error);
+    console.log('Fetch analysis error:', error);
     throw new Error('Failed to fetch analysis. Please try again.');
   }
 }
