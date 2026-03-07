@@ -41,75 +41,42 @@ An intelligent content analysis system that helps creators improve their digital
 
 ## 🚀 Quick Start
 
-### Prerequisites
+**Complete deployment guide:** See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 
-- Node.js 18.x or later
-- Vercel account
-- OpenAI API key
+**Quick version:**
 
-### 1. Clone and Install
+1. **Deploy Backend**
+   ```bash
+   vercel login
+   vercel --prod
+   ```
 
-```bash
-git clone <repository-url>
-cd content-quality-reviewer
-npm install
-```
+2. **Set Up Database**
+   - Create Vercel KV database in dashboard
+   - Connect to your project
 
-### 2. Deploy to Vercel
+3. **Configure Environment Variables**
+   ```bash
+   OPENAI_API_KEY=sk-your-key
+   JWT_SECRET=<generate-random>
+   MAX_CONTENT_LENGTH=2000
+   RATE_LIMIT_WINDOW=60
+   RATE_LIMIT_MAX=10
+   ```
 
-```bash
-# Login to Vercel
-vercel login
+4. **Configure Frontend**
+   ```bash
+   cd .kiro/specs/content-quality-reviewer/frontend
+   # Edit .env: VITE_API_ENDPOINT=https://your-project.vercel.app
+   npm install
+   npm run dev
+   ```
 
-# Deploy to production
-vercel --prod
-```
-
-### 3. Set Up Vercel KV Database
-
-1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-2. Navigate to **Storage** → **Create Database**
-3. Select **KV (Redis)**
-4. Name it (e.g., `content-quality-kv`)
-5. Click **Create**
-6. Connect it to your project
-
-### 4. Configure Environment Variables
-
-In Vercel Dashboard → Your Project → **Settings** → **Environment Variables**:
-
-```bash
-OPENAI_API_KEY=sk-your-key-here
-JWT_SECRET=your-secure-random-string
-MAX_CONTENT_LENGTH=2000
-RATE_LIMIT_WINDOW=60
-RATE_LIMIT_MAX=10
-```
-
-Generate JWT_SECRET:
-```bash
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-
-### 5. Configure Frontend
-
-```bash
-cd .kiro/specs/content-quality-reviewer/frontend
-
-# Update .env
-VITE_API_ENDPOINT=https://your-project.vercel.app
-
-# Install and run
-npm install
-npm run dev
-```
+**For detailed step-by-step instructions, see [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)**
 
 ## 📖 Documentation
 
-- **[VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)** - Complete deployment guide
-- **[FRONTEND_SETUP_GUIDE.md](./FRONTEND_SETUP_GUIDE.md)** - Frontend configuration
-- **[QUICK_DEPLOYMENT_REFERENCE.md](./QUICK_DEPLOYMENT_REFERENCE.md)** - Quick reference
-- **[MIGRATION_COMPLETE.md](./MIGRATION_COMPLETE.md)** - Migration summary
+- **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - Complete deployment guide (START HERE)
 
 ## 🏛️ Project Structure
 
@@ -231,7 +198,7 @@ Frontend (.env):
 - Check frontend `VITE_API_ENDPOINT` is correct
 - Clear browser cache
 
-See [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md) for more troubleshooting tips.
+**For more troubleshooting, see [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md#troubleshooting)**
 
 ## 📈 Monitoring
 
@@ -292,7 +259,7 @@ Contributions are welcome! Please read the contributing guidelines before submit
 
 For issues or questions:
 1. Check Vercel function logs
-2. Review [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)
+2. Review [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 3. Open an issue on GitHub
 
 ---
