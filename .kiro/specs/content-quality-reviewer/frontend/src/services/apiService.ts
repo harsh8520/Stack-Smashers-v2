@@ -1,4 +1,4 @@
-import { fetchAuthSession, getCurrentUser as getUser, signOut as amplifySignOut } from 'aws-amplify/auth';
+import { getAuthHeader, getCurrentUser, signOut as authSignOut } from './authService';
 
 export interface AnalyzeRequest {
   content: string;
@@ -66,21 +66,16 @@ export interface HistoryResult {
  */
 export async function analyzeContent(request: AnalyzeRequest): Promise<AnalysisResult> {
   try {
-    const session = await fetchAuthSession();
-    const token = session.tokens?.idToken?.toString();
-
-    if (!token) {
-      throw new Error('No authentication token available');
-    }
-
+    const authHeaders = getAuthHeader();
     const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
-    console.log('Making analyze request to:', `${apiEndpoint}/analyze`);
+    
+    console.log('Making analyze request to:', `${apiEndpoint}/api/analyze`);
     console.log('Request payload:', request);
 
-    const response = await fetch(`${apiEndpoint}/analyze`, {
+    const response = await fetch(`${apiEndpoint}/api/analyze`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        ...authHeaders,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(request),
@@ -88,7 +83,7 @@ export async function analyzeContent(request: AnalyzeRequest): Promise<AnalysisR
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
     }
 
     const result = await response.json();
@@ -110,18 +105,13 @@ export async function analyzeContent(request: AnalyzeRequest): Promise<AnalysisR
  */
 export async function getAnalysisById(analysisId: string): Promise<AnalysisResult> {
   try {
-    const session = await fetchAuthSession();
-    const token = session.tokens?.idToken?.toString();
-
-    if (!token) {
-      throw new Error('No authentication token available');
-    }
-
+    const authHeaders = getAuthHeader();
     const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
-    const response = await fetch(`${apiEndpoint}/analysis/${analysisId}`, {
+    
+    const response = await fetch(`${apiEndpoint}/api/analysis/${analysisId}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        ...authHeaders,
         'Content-Type': 'application/json',
       },
     });
@@ -143,19 +133,13 @@ export async function getAnalysisById(analysisId: string): Promise<AnalysisResul
  */
 export async function getUserHistory(limit: number = 10): Promise<HistoryResult> {
   try {
-    const session = await fetchAuthSession();
-    const token = session.tokens?.idToken?.toString();
-    const user = await getUser();
-
-    if (!token) {
-      throw new Error('No authentication token available');
-    }
-
+    const authHeaders = getAuthHeader();
     const apiEndpoint = import.meta.env.VITE_API_ENDPOINT;
-    const response = await fetch(`${apiEndpoint}/history?userId=${user.username}&limit=${limit}`, {
+    
+    const response = await fetch(`${apiEndpoint}/api/history?limit=${limit}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        ...authHeaders,
         'Content-Type': 'application/json',
       },
     });
@@ -175,21 +159,14 @@ export async function getUserHistory(limit: number = 10): Promise<HistoryResult>
 /**
  * Gets the current authenticated user
  */
-export async function getCurrentUser() {
-  try {
-    const user = await getUser();
-    return user;
-  } catch (error) {
-    return null;
-  }
-}
+export { getCurrentUser };
 
 /**
  * Signs out the current user
  */
 export async function signOut() {
   try {
-    await amplifySignOut();
+    authSignOut();
   } catch (error) {
     console.error('Sign out error:', error);
     throw error;

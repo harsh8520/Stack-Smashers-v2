@@ -1,246 +1,168 @@
-# 🚀 Start Here - Content Quality Reviewer Deployment
+# 🚀 Start Here - Content Quality Reviewer
 
-Welcome! This guide will help you deploy the Content Quality Reviewer application to AWS.
+Welcome! This guide will help you deploy the Content Quality Reviewer application to Vercel.
 
 ## 📋 What You'll Deploy
 
 A serverless AI-powered content analysis system with:
-- **Backend**: AWS Lambda + API Gateway + DynamoDB + Bedrock
-- **Frontend**: React app (runs locally)
-- **Authentication**: Amazon Cognito
-- **AI Analysis**: Amazon Bedrock Nova Sonic + AWS Comprehend
+- **Backend**: Vercel Serverless Functions + OpenAI API
+- **Database**: Vercel KV (Redis)
+- **Authentication**: JWT-based auth
+- **Frontend**: React app
 
 ## ⏱️ Time Required
 
-- **First-time deployment**: 30-45 minutes
-- **Subsequent deployments**: 10-15 minutes
+- **First-time setup**: 15-30 minutes
+- **Subsequent deployments**: 2-5 minutes
 
-## 📚 Documentation Files
+## 🎯 Choose Your Path
 
-Choose the guide that fits your needs:
+### Path 1: Quick Deploy (Recommended)
+**Best for**: Getting started quickly
 
-### 1. **QUICK_DEPLOY.md** ⚡
-**Best for**: Experienced developers who want quick commands
-- Command reference
-- No explanations
-- Copy-paste ready
+1. Deploy to Vercel
+2. Set up Vercel KV database
+3. Configure environment variables
+4. Test the deployment
 
-### 2. **DEPLOYMENT_GUIDE.md** 📖
-**Best for**: First-time deployers who want detailed instructions
-- Step-by-step guide
-- Explanations for each step
-- Troubleshooting section
-- Architecture diagrams
+**Time**: ~15 minutes
 
-### 3. **DEPLOYMENT_CHECKLIST.md** ✅
-**Best for**: Tracking your progress
-- Interactive checklist
-- Track what's done
-- Note important values
-- Verification steps
+See: [QUICK_DEPLOYMENT_REFERENCE.md](./QUICK_DEPLOYMENT_REFERENCE.md)
 
-### 4. **SETUP_GUIDE.md** 🔧
-**Best for**: Complete setup from scratch
-- Prerequisites installation
-- AWS account setup
-- Local environment configuration
-- Testing instructions
+### Path 2: Complete Setup
+**Best for**: Understanding the full setup
 
-## 🎯 Quick Start (3 Steps)
+1. Prerequisites installation
+2. Local development setup
+3. Vercel deployment
+4. Frontend configuration
+5. Testing and monitoring
 
-### Step 1: Verify Prerequisites
-```powershell
+**Time**: ~30 minutes
+
+See: [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)
+
+## ✅ Prerequisites
+
+Check you have these installed:
+
+```bash
 node --version    # Need v18+
-aws --version     # Need aws-cli/2.x
-cdk --version     # Need 2.x
-aws sts get-caller-identity  # Verify AWS access
+vercel --version  # Install with: npm install -g vercel
 ```
 
-### Step 2: One-Time AWS Setup
-```powershell
-# Set up API Gateway logging (required once per account)
-aws iam create-role --role-name APIGatewayCloudWatchLogsRole --assume-role-policy-document file://trust-policy.json
+You'll also need:
+- Vercel account (free tier works)
+- OpenAI API key
 
-aws iam attach-role-policy --role-name APIGatewayCloudWatchLogsRole --policy-arn "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+## 🚀 Quick Start
 
-# Get your account ID
-$ACCOUNT_ID = (aws sts get-caller-identity --query Account --output text)
+### Step 1: Deploy Backend
 
-# Configure API Gateway
-aws apigateway update-account --patch-operations op=replace,path=/cloudwatchRoleArn,value=arn:aws:iam::${ACCOUNT_ID}:role/APIGatewayCloudWatchLogsRole
+```bash
+# Login to Vercel
+vercel login
+
+# Deploy to production
+vercel --prod
 ```
 
-### Step 3: Deploy
-```powershell
-# Build and deploy backend
-npm install
-npm run build
-npm test
-cdk deploy --require-approval never
+### Step 2: Set Up Vercel KV
 
-# Save the outputs (ApiEndpoint, UserPoolId, UserPoolClientId)
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Navigate to **Storage** → **Create Database** → **KV**
+3. Name it `content-quality-kv`
+4. Connect it to your project
 
-# Enable Bedrock in AWS Console:
-# AWS Console → Bedrock → Model access → Enable "Amazon Nova Sonic"
+### Step 3: Configure Environment Variables
 
-# Configure and run frontend
-cd .kiro/specs/content-quality-reviewer/frontend
-# Create .env file with your deployment outputs
-npm install
-npm run dev
+In Vercel Dashboard → Your Project → **Settings** → **Environment Variables**:
 
-# Open http://localhost:5173/
+```bash
+OPENAI_API_KEY=sk-your-key-here
+JWT_SECRET=<generate-random-string>
+MAX_CONTENT_LENGTH=2000
+RATE_LIMIT_WINDOW=60
+RATE_LIMIT_MAX=10
 ```
 
-## 🆘 Need Help?
+Generate JWT_SECRET:
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
 
-### Common Issues
+### Step 4: Test Your Deployment
 
-| Problem | Solution |
-|---------|----------|
-| "CloudWatch Logs role ARN must be set" | Complete Step 2 above |
-| "Resource already exists" | See DEPLOYMENT_GUIDE.md → Troubleshooting |
-| "Access Denied" | Check AWS credentials: `aws configure` |
-| Bedrock errors | Enable model access in AWS Console |
-| Frontend won't connect | Verify `.env` file values |
+```bash
+# Test signup
+curl -X POST https://your-project.vercel.app/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"test123"}'
 
-### Where to Get Help
+# Test login
+curl -X POST https://your-project.vercel.app/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"test123"}'
+```
 
-1. **DEPLOYMENT_GUIDE.md** - Full troubleshooting section
-2. **CloudWatch Logs** - Check Lambda function logs
-3. **Browser Console** - Check for frontend errors
-4. **AWS Console** - Verify resources are created
+## 📚 Documentation
+
+- **[QUICK_DEPLOYMENT_REFERENCE.md](./QUICK_DEPLOYMENT_REFERENCE.md)** - Quick reference guide
+- **[VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)** - Complete deployment walkthrough
+- **[FRONTEND_SETUP_GUIDE.md](./FRONTEND_SETUP_GUIDE.md)** - Frontend configuration
+- **[MIGRATION_COMPLETE.md](./MIGRATION_COMPLETE.md)** - Migration summary
+
+## 🐛 Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| "Environment variable not set" | Add missing env vars in Vercel dashboard |
+| "KV connection error" | Ensure KV database is connected to project |
+| "OpenAI API error" | Check API key and credits |
+| CORS errors | Verify `vercel.json` has CORS headers |
+
+## 📞 Need Help?
+
+1. **Check Logs**: Vercel Dashboard → Functions → Logs
+2. **Review Docs**: See documentation links above
+3. **Troubleshooting**: Check [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)
 
 ## 📁 Project Structure
 
 ```
-E:\AWS\
-├── lambda/                          # Backend Lambda functions
-│   ├── orchestrator/               # Main analysis orchestrator
-│   ├── api/                        # API endpoint handlers
-│   ├── analyzers/                  # Content analyzers
-│   ├── bedrock/                    # Bedrock integration
-│   └── storage/                    # DynamoDB operations
-├── lib/                            # CDK infrastructure code
-├── test/                           # Unit tests
-├── .kiro/specs/content-quality-reviewer/
-│   └── frontend/                   # React frontend app
-├── DEPLOYMENT_GUIDE.md             # Detailed deployment guide
-├── QUICK_DEPLOY.md                 # Quick command reference
-├── DEPLOYMENT_CHECKLIST.md         # Progress tracker
-├── START_HERE.md                   # This file
-└── trust-policy.json               # IAM trust policy
+content-quality-reviewer/
+├── api/                    # Vercel serverless functions
+│   ├── analyze.js         # Main analysis endpoint
+│   ├── history.js         # User history
+│   ├── analysis/[id].js   # Get specific analysis
+│   └── auth/              # Authentication endpoints
+├── lib/                   # Shared libraries
+│   ├── auth.js           # JWT authentication
+│   ├── storage.js        # Vercel KV operations
+│   ├── openai-client.js  # OpenAI integration
+│   └── analyzers/        # Content analyzers
+└── .kiro/specs/content-quality-reviewer/frontend/
+    └── src/              # React frontend
 ```
 
-## 💰 Cost Estimate
+## 🎉 Success Criteria
 
-With AWS Free Tier:
-- **DynamoDB**: Free (25 GB, 25 WCU, 25 RCU)
-- **Lambda**: Free (1M requests/month)
-- **API Gateway**: Free (1M requests/month)
-- **Cognito**: Free (50,000 MAUs)
-- **Bedrock Nova Sonic**: ~$0.0004 per 1K tokens
-- **Comprehend**: $0.0001 per unit (50K free)
+Your deployment is successful when:
+1. ✅ Backend deploys without errors
+2. ✅ Vercel KV database is connected
+3. ✅ Environment variables are set
+4. ✅ API endpoints respond correctly
+5. ✅ Users can sign up and log in
+6. ✅ Content analysis works
 
-**Estimated cost for testing**: $0-5/month
+## 🚦 Next Steps
 
-## 🎓 What You'll Learn
-
-By deploying this project, you'll gain hands-on experience with:
-- ✅ AWS CDK for infrastructure as code
-- ✅ Serverless architecture with Lambda
-- ✅ API Gateway with Cognito authentication
-- ✅ DynamoDB NoSQL database
-- ✅ Amazon Bedrock AI integration
-- ✅ React frontend with AWS Amplify
-- ✅ CloudWatch logging and monitoring
-
-## 🔄 Deployment Workflow
-
-```
-┌─────────────────┐
-│ 1. Prerequisites│
-│    Verify       │
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│ 2. One-Time     │
-│    AWS Setup    │
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│ 3. Build &      │
-│    Test         │
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│ 4. Deploy       │
-│    Backend      │
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│ 5. Enable       │
-│    Bedrock      │
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│ 6. Configure    │
-│    Frontend     │
-└────────┬────────┘
-         │
-┌────────▼────────┐
-│ 7. Test         │
-│    Application  │
-└─────────────────┘
-```
-
-## ✅ Success Criteria
-
-You'll know deployment is successful when:
-- ✅ `cdk deploy` completes without errors
-- ✅ You receive deployment outputs (API endpoint, User Pool ID, etc.)
-- ✅ Frontend loads at `http://localhost:5173/`
-- ✅ You can sign up and log in
-- ✅ Content analysis returns results
-- ✅ History page shows past analyses
-
-## 🧹 Clean Up
-
-When you're done testing:
-```powershell
-# Destroy all AWS resources
-cdk destroy
-
-# Delete retained resources
-aws dynamodb delete-table --table-name ContentAnalysisResults
-aws cognito-idp delete-user-pool --user-pool-id us-east-1_xxxxx
-```
-
-## 📞 Support
-
-If you get stuck:
-1. Check **DEPLOYMENT_GUIDE.md** troubleshooting section
-2. Review CloudWatch Logs for errors
-3. Verify all prerequisites are met
-4. Check AWS Console for resource status
+After successful deployment:
+1. Update frontend `.env` with your Vercel URL
+2. Test all features thoroughly
+3. Monitor logs and metrics
+4. Set up custom domain (optional)
 
 ---
 
-## 🎯 Ready to Deploy?
-
-Choose your path:
-
-**Option A: Quick Deploy** (experienced users)
-→ Open **QUICK_DEPLOY.md**
-
-**Option B: Guided Deploy** (first-time users)
-→ Open **DEPLOYMENT_GUIDE.md**
-
-**Option C: Track Progress** (organized approach)
-→ Open **DEPLOYMENT_CHECKLIST.md**
-
----
-
-**Good luck with your deployment! 🚀**
-
-*Estimated deployment time: 30-45 minutes*
+**Ready to deploy?** Start with [QUICK_DEPLOYMENT_REFERENCE.md](./QUICK_DEPLOYMENT_REFERENCE.md)

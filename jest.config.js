@@ -1,11 +1,12 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/test'],
-  testMatch: ['**/*.test.ts'],
+  roots: ['<rootDir>/test', '<rootDir>/lib', '<rootDir>/api'],
+  testMatch: ['**/*.test.ts', '**/*.test.js'],
   collectCoverageFrom: [
     'lambda/**/*.ts',
     'lib/**/*.ts',
+    'lib/**/*.js',
     '!**/*.d.ts',
     '!**/node_modules/**'
   ],

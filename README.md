@@ -1,16 +1,16 @@
 # AI-Powered Content Quality Reviewer
 
-An intelligent content analysis system that helps student creators improve their digital content quality before publishing. Built with AWS serverless architecture, Amazon Bedrock (Nova Sonic), and React.
+An intelligent content analysis system that helps creators improve their digital content quality before publishing. Built with Vercel serverless architecture, OpenAI API, and React.
 
 ## 🏗️ Architecture
 
-- **Frontend**: React + Vite + AWS Amplify
-- **Backend**: AWS Lambda + API Gateway (REST)
-- **Authentication**: Amazon Cognito
-- **AI Analysis**: Amazon Bedrock (Nova Sonic)
-- **Database**: Amazon DynamoDB
-- **NLP**: Amazon Comprehend
-- **Deployment**: AWS CDK + Amplify Hosting
+- **Frontend**: React + Vite
+- **Backend**: Vercel Serverless Functions
+- **Authentication**: JWT-based authentication
+- **AI Analysis**: OpenAI GPT-4
+- **Database**: Vercel KV (Redis)
+- **NLP**: Sentiment library + OpenAI
+- **Deployment**: Vercel
 
 ## ✨ Features
 
@@ -21,9 +21,10 @@ An intelligent content analysis system that helps student creators improve their
   - Platform-Specific Optimization
 
 - **AI-Powered Insights**
-  - Amazon Nova Sonic for fast, cost-effective analysis
-  - AWS Comprehend for sentiment and NLP
+  - OpenAI GPT-4 for comprehensive analysis
+  - Local NLP for sentiment analysis
   - Custom analyzers for detailed feedback
+  - Weighted score merging (70% local, 30% AI)
 
 - **Platform Support**
   - Blog posts
@@ -32,19 +33,19 @@ An intelligent content analysis system that helps student creators improve their
   - Medium stories
 
 - **User Features**
-  - Secure authentication with Cognito
+  - Secure JWT authentication
   - Analysis history tracking
   - Real-time feedback
   - Actionable suggestions
+  - Rate limiting protection
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- AWS Account with appropriate permissions
-- Node.js 20.x or later
-- AWS CLI configured
-- AWS CDK CLI installed
+- Node.js 18.x or later
+- Vercel account
+- OpenAI API key
 
 ### 1. Clone and Install
 
@@ -54,130 +55,129 @@ cd content-quality-reviewer
 npm install
 ```
 
-### 2. Deploy Backend
+### 2. Deploy to Vercel
 
 ```bash
-# Make deploy script executable (Linux/Mac)
-chmod +x deploy.sh
+# Login to Vercel
+vercel login
 
-# Run deployment
-./deploy.sh
-
-# Or manually:
-npm install
-cdk bootstrap
-cdk deploy
+# Deploy to production
+vercel --prod
 ```
 
-### 3. Enable Bedrock Access
+### 3. Set Up Vercel KV Database
 
-1. Go to AWS Console → Amazon Bedrock
-2. Navigate to "Model access"
-3. Enable **Amazon Nova Sonic** (us.amazon.nova-sonic-v1:0)
-4. Wait for approval (usually instant)
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Navigate to **Storage** → **Create Database**
+3. Select **KV (Redis)**
+4. Name it (e.g., `content-quality-kv`)
+5. Click **Create**
+6. Connect it to your project
 
-### 4. Configure Frontend
+### 4. Configure Environment Variables
+
+In Vercel Dashboard → Your Project → **Settings** → **Environment Variables**:
+
+```bash
+OPENAI_API_KEY=sk-your-key-here
+JWT_SECRET=your-secure-random-string
+MAX_CONTENT_LENGTH=2000
+RATE_LIMIT_WINDOW=60
+RATE_LIMIT_MAX=10
+```
+
+Generate JWT_SECRET:
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+
+### 5. Configure Frontend
 
 ```bash
 cd .kiro/specs/content-quality-reviewer/frontend
+
+# Update .env
+VITE_API_ENDPOINT=https://your-project.vercel.app
+
+# Install and run
 npm install
-
-# Create aws-exports.js with values from CDK output
-# See IMPLEMENTATION_GUIDE.md for details
-```
-
-### 5. Deploy Frontend
-
-```bash
-# Option 1: Deploy to Amplify
-amplify init
-amplify add hosting
-amplify publish
-
-# Option 2: Run locally
 npm run dev
 ```
 
 ## 📖 Documentation
 
-- **[IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)** - Complete step-by-step setup guide
-- **[TESTING_GUIDE.md](./TESTING_GUIDE.md)** - Testing strategies and examples
-- **[NOVA_MIGRATION.md](./NOVA_MIGRATION.md)** - Nova model migration notes
-- **[PROJECT_STATUS_ANALYSIS.md](./PROJECT_STATUS_ANALYSIS.md)** - Current project status
+- **[VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)** - Complete deployment guide
+- **[FRONTEND_SETUP_GUIDE.md](./FRONTEND_SETUP_GUIDE.md)** - Frontend configuration
+- **[QUICK_DEPLOYMENT_REFERENCE.md](./QUICK_DEPLOYMENT_REFERENCE.md)** - Quick reference
+- **[MIGRATION_COMPLETE.md](./MIGRATION_COMPLETE.md)** - Migration summary
 
 ## 🏛️ Project Structure
 
 ```
 content-quality-reviewer/
-├── lambda/                      # Lambda function code
-│   ├── analyzers/              # Content analyzers
-│   │   ├── structure-analyzer.ts
-│   │   ├── tone-analyzer.ts
-│   │   ├── accessibility-checker.ts
-│   │   └── platform-adapter.ts
-│   ├── orchestrator/           # Main orchestrator
-│   │   └── handler.ts
-│   ├── bedrock/                # Bedrock integration
-│   │   ├── bedrock-client.ts
-│   │   ├── prompt-template.ts
-│   │   └── error-handler.ts
-│   ├── comprehend/             # Comprehend integration
-│   │   └── comprehend-service.ts
-│   ├── storage/                # DynamoDB operations
-│   │   ├── storage-service.ts
-│   │   └── types.ts
-│   └── auth/                   # Authentication
-│       └── handler.ts
-├── lib/                        # CDK infrastructure
-│   ├── cdk-app.ts
-│   └── content-reviewer-stack.ts
-├── test/                       # Unit tests
-│   └── storage-service.test.ts
-├── .kiro/specs/                # Spec documents
-│   └── content-quality-reviewer/
-│       ├── requirements.md
-│       ├── design.md
-│       ├── tasks.md
-│       └── frontend/           # React frontend
-├── deploy.sh                   # Deployment script
-└── IMPLEMENTATION_GUIDE.md     # Complete setup guide
+├── api/                        # Vercel serverless functions
+│   ├── analyze.js             # Main content analysis endpoint
+│   ├── history.js             # User history endpoint
+│   ├── analysis/
+│   │   └── [id].js           # Get specific analysis
+│   └── auth/
+│       ├── login.js          # Login endpoint
+│       └── signup.js         # Signup endpoint
+├── lib/                       # Shared libraries
+│   ├── auth.js               # JWT authentication
+│   ├── storage.js            # Vercel KV operations
+│   ├── rate-limit.js         # Rate limiting
+│   ├── openai-client.js      # OpenAI integration
+│   ├── nlp-utils.js          # NLP utilities
+│   └── analyzers/            # Content analyzers
+│       ├── structure-analyzer.js
+│       ├── tone-analyzer.js
+│       ├── accessibility-checker.js
+│       ├── platform-adapter.js
+│       └── score-merger.js
+├── .kiro/specs/content-quality-reviewer/
+│   └── frontend/             # React frontend
+│       ├── src/
+│       │   ├── services/
+│       │   │   ├── authService.ts
+│       │   │   └── apiService.ts
+│       │   └── components/
+│       └── .env
+├── vercel.json               # Vercel configuration
+└── package.json              # Dependencies
 ```
 
 ## 🧪 Testing
 
 ```bash
-# Run unit tests
+# Run all tests
 npm test
 
-# Run tests with coverage
-npm run test:coverage
-
 # Run specific test file
-npm test storage-service.test.ts
+npm test api/analyze.test.js
+
+# Run with coverage
+npm test -- --coverage
 ```
 
 ## 📊 Cost Estimation
 
 Monthly costs for 1,000 analyses:
 
-- Lambda: ~$5
-- API Gateway: ~$3.50
-- DynamoDB: ~$2
-- Bedrock (Nova Sonic): ~$3-5
-- Cognito: Free (up to 50K MAUs)
-- Amplify: ~$0.15/GB
-- CloudWatch: ~$5
+- Vercel Functions: ~$0 (Hobby plan includes 100GB-hours)
+- Vercel KV: ~$0 (Hobby plan includes 256MB)
+- OpenAI API (GPT-4): ~$30-50 (depends on usage)
 
-**Total: ~$18-20/month**
+**Total: ~$30-50/month** (mostly OpenAI costs)
 
 ## 🔒 Security
 
-- Cognito user authentication
-- API Gateway authorization
-- DynamoDB encryption at rest
-- Secrets Manager for API keys
-- IAM least-privilege policies
-- CloudWatch audit logging
+- JWT token authentication
+- bcrypt password hashing
+- Rate limiting (10 requests/minute)
+- CORS configuration
+- Vercel KV encryption at rest
+- HTTPS by default
 
 ## 🛠️ Development
 
@@ -187,48 +187,98 @@ Monthly costs for 1,000 analyses:
 # Install dependencies
 npm install
 
-# Run tests
-npm test
+# Run backend locally
+vercel dev
 
-# Synthesize CloudFormation
-cdk synth
-
-# Deploy to AWS
-cdk deploy
+# Run frontend (in another terminal)
+cd .kiro/specs/content-quality-reviewer/frontend
+npm run dev
 ```
 
 ### Environment Variables
 
-Backend (Lambda):
-- `BEDROCK_MODEL_ID`: us.amazon.nova-sonic-v1:0
-- `DYNAMODB_TABLE_NAME`: ContentAnalysisResults
-- `COMPREHEND_REGION`: us-east-1
-- `MAX_CONTENT_LENGTH`: 2000
-- `ANALYSIS_TIMEOUT_MS`: 25000
+Backend:
+- `OPENAI_API_KEY`: OpenAI API key
+- `JWT_SECRET`: Secure random string for JWT signing
+- `KV_REST_API_URL`: Auto-configured by Vercel KV
+- `KV_REST_API_TOKEN`: Auto-configured by Vercel KV
+- `MAX_CONTENT_LENGTH`: Maximum content length in words (default: 2000)
+- `RATE_LIMIT_WINDOW`: Rate limit window in seconds (default: 60)
+- `RATE_LIMIT_MAX`: Max requests per window (default: 10)
 
 Frontend (.env):
-- `VITE_AWS_REGION`: us-east-1
-- `VITE_USER_POOL_ID`: <from CDK output>
-- `VITE_USER_POOL_CLIENT_ID`: <from CDK output>
-- `VITE_API_ENDPOINT`: <from CDK output>
+- `VITE_API_ENDPOINT`: Your Vercel deployment URL
 
 ## 🐛 Troubleshooting
 
-### Bedrock Access Denied
-- Ensure model access is enabled in Bedrock console
-- Verify IAM permissions include `bedrock:InvokeModel`
+### OpenAI API Errors
+- Verify `OPENAI_API_KEY` is set correctly
+- Check API key has sufficient credits
+- Review OpenAI usage dashboard
 
-### Cognito Authentication Fails
-- Check User Pool ID and Client ID in aws-exports.js
-- Verify CORS settings in API Gateway
-- Ensure Authorization header format is correct
+### Authentication Issues
+- Ensure `JWT_SECRET` is set
+- Check token is included in Authorization header
+- Verify token hasn't expired (7 day expiry)
 
-### Lambda Timeout
-- Increase timeout in CDK (currently 30s)
-- Consider using Nova Sonic for faster responses
-- Optimize content length
+### Rate Limit Errors
+- Default: 10 requests per 60 seconds
+- Adjust `RATE_LIMIT_MAX` and `RATE_LIMIT_WINDOW` if needed
+- Check Vercel KV usage
 
-See [IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md) for more troubleshooting tips.
+### CORS Errors
+- Verify `vercel.json` has CORS headers configured
+- Check frontend `VITE_API_ENDPOINT` is correct
+- Clear browser cache
+
+See [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md) for more troubleshooting tips.
+
+## 📈 Monitoring
+
+### Vercel Dashboard
+- **Functions**: Monitor execution time and errors
+- **Logs**: View real-time function logs
+- **Analytics**: Track usage metrics
+- **Storage**: Monitor KV usage
+
+### Key Metrics
+- Function execution time
+- Error rates
+- KV storage usage
+- OpenAI API costs
+
+## 🔄 Deployment
+
+### Automatic Deployment
+Push to your main branch and Vercel automatically deploys.
+
+### Manual Deployment
+```bash
+vercel --prod
+```
+
+### Rollback
+```bash
+vercel rollback
+```
+
+Or use Vercel Dashboard → Deployments → Promote previous deployment
+
+## 📝 API Endpoints
+
+### Authentication
+- `POST /api/auth/signup` - Create new account
+- `POST /api/auth/login` - Login to existing account
+
+### Content Analysis
+- `POST /api/analyze` - Analyze content (requires auth)
+- `GET /api/analysis/:id` - Get specific analysis (requires auth)
+- `GET /api/history?limit=10` - Get analysis history (requires auth)
+
+All authenticated endpoints require:
+```
+Authorization: Bearer <jwt_token>
+```
 
 ## 📝 License
 
@@ -241,10 +291,10 @@ Contributions are welcome! Please read the contributing guidelines before submit
 ## 📞 Support
 
 For issues or questions:
-1. Check CloudWatch logs
-2. Review [IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)
+1. Check Vercel function logs
+2. Review [VERCEL_DEPLOYMENT_GUIDE.md](./VERCEL_DEPLOYMENT_GUIDE.md)
 3. Open an issue on GitHub
 
 ---
 
-**Built with ❤️ using AWS Serverless, Amazon Bedrock, and React**
+**Built with ❤️ using Vercel, OpenAI, and React**

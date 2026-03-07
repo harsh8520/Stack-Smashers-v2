@@ -1,52 +1,38 @@
 {
   "name": "content-quality-reviewer",
-  "version": "1.0.0",
-  "description": "AI-powered Content Quality Reviewer Backend",
+  "version": "2.0.0",
+  "description": "AI-powered Content Quality Reviewer - Vercel Backend",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w",
     "test": "jest",
     "test:watch": "jest --watch",
-    "cdk": "cdk",
-    "deploy": "cdk deploy",
-    "synth": "cdk synth"
+    "dev": "vercel dev",
+    "deploy": "vercel deploy",
+    "deploy:prod": "vercel deploy --prod"
   },
   "keywords": [
-    "aws",
-    "lambda",
-    "bedrock",
-    "content-analysis"
+    "vercel",
+    "openai",
+    "content-analysis",
+    "serverless"
   ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@aws-amplify/ui-react": "^6.15.1",
-    "@aws-sdk/client-bedrock-runtime": "^3.700.0",
-    "@aws-sdk/client-comprehend": "^3.700.0",
-    "@aws-sdk/client-dynamodb": "^3.700.0",
-    "@aws-sdk/client-secrets-manager": "^3.700.0",
-    "@aws-sdk/lib-dynamodb": "^3.700.0",
-    "aws-amplify": "^6.16.2",
-    "aws-cdk-lib": "^2.170.0",
-    "constructs": "^10.0.0",
-    "source-map-support": "^0.5.21",
+    "@vercel/kv": "^3.0.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "openai": "^4.77.0",
+    "sentiment": "^5.0.2",
     "uuid": "^11.0.3"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.145",
+    "@types/bcryptjs": "^2.4.6",
     "@types/jest": "^29.5.14",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.10.2",
     "@types/uuid": "^10.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.18.1",
-    "@typescript-eslint/parser": "^8.18.1",
-    "aws-cdk": "^2.170.0",
-    "aws-sdk-client-mock": "^4.1.0",
-    "eslint": "^9.17.0",
     "fast-check": "^3.23.1",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.2.5",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "jest": "^29.7.0"
   }
 }

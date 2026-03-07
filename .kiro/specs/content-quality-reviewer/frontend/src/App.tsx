@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCurrentUser, signOut } from 'aws-amplify/auth';
+import { getCurrentUser, isAuthenticated as checkAuth, signOut } from './services/authService';
 import LandingPage from './components/LandingPage';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
@@ -32,8 +32,8 @@ export default function App() {
 
   const checkAuthStatus = async () => {
     try {
-      await getCurrentUser();
-      setIsAuthenticated(true);
+      const isAuth = checkAuth();
+      setIsAuthenticated(isAuth);
     } catch (error) {
       setIsAuthenticated(false);
     } finally {
@@ -57,7 +57,7 @@ export default function App() {
 
   const handleSignOut = async () => {
     try {
-      await signOut();
+      signOut();
       setIsAuthenticated(false);
       setCurrentScreen('landing');
     } catch (error) {
