@@ -1,277 +1,183 @@
-# AI-Powered Content Quality Reviewer
+# ContentLens AI
 
-An intelligent content analysis system that helps creators improve their digital content quality before publishing. Built with Vercel serverless architecture, OpenAI API, and React.
+An intelligent content quality analysis platform powered by AI and NLP that helps content creators optimize their writing for different platforms and audiences.
 
-## 🏗️ Architecture
+## 🚀 Features
 
-- **Frontend**: React + Vite + TypeScript
-- **Backend**: Vercel Serverless Functions (Node.js)
-- **Authentication**: JWT-based authentication
-- **AI Analysis**: OpenAI GPT-4 Turbo
-- **Database**: MongoDB Atlas
-- **Deployment**: Vercel
+- **Multi-Platform Optimization**: Tailored analysis for Blog, LinkedIn, Twitter, and Medium
+- **AI-Powered Insights**: Uses Groq's LLaMA 3.1 70B for deep content analysis
+- **Comprehensive Scoring**: Multi-dimensional analysis (Clarity, Structure, Tone, Engagement, SEO)
+- **Readability Metrics**: Flesch Reading Ease, Grade Level, and more
+- **Keyword Analysis**: SEO-focused keyword extraction and density analysis
+- **Real-Time Processing**: Get results in under 2 seconds
+- **User Authentication**: Secure JWT-based auth with MongoDB
+- **Analysis History**: Track and review past analyses
 
-## ✨ Features
+## 🛠️ Technology Stack
 
-- **Multi-Dimensional Analysis**
-  - Structure & Organization
-  - Tone & Voice
-  - Accessibility & Readability
-  - Platform-Specific Optimization
+### Frontend
+- React 18 with TypeScript
+- Vite for fast development
+- Tailwind CSS + shadcn/ui components
+- Recharts for data visualization
 
-- **AI-Powered Insights**
-  - OpenAI GPT-4 for comprehensive analysis
-  - Local NLP for sentiment analysis
-  - Custom analyzers for detailed feedback
-  - Weighted score merging (70% local, 30% AI)
+### Backend
+- Node.js with Express
+- MongoDB for data persistence
+- Groq AI SDK (LLaMA 3.1 70B)
+- JWT authentication
+- bcrypt for password hashing
 
-- **Platform Support**
-  - Blog posts
-  - LinkedIn articles
-  - Twitter/X posts
-  - Medium stories
+### NLP & Analysis
+- Sentiment analysis
+- Readability calculations (Flesch-Kincaid, SMOG, etc.)
+- Keyword extraction with TF-IDF
+- Custom analyzers for structure, tone, and accessibility
 
-- **User Features**
-  - Secure JWT authentication
-  - Analysis history tracking
-  - Real-time feedback
-  - Actionable suggestions
-  - Rate limiting protection
+## 📦 Installation
 
-## 🚀 Quick Start
+### Prerequisites
+- Node.js 18+ 
+- MongoDB database
+- Groq API key
 
-**Complete deployment guide:** See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
+### Setup
 
-**Quick version:**
-
-1. **Set up MongoDB Atlas**
-   - Create free cluster at [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas)
-   - Create database user and get connection string
-
-2. **Deploy Backend**
-   ```bash
-   npm install -g vercel
-   vercel login
-   vercel --prod
-   ```
-
-3. **Configure Environment Variables in Vercel**
-   ```bash
-   MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/content_quality_reviewer
-   OPENAI_API_KEY=sk-your-key
-   JWT_SECRET=<generate-random>
-   MAX_CONTENT_LENGTH=2000
-   RATE_LIMIT_WINDOW=60
-   RATE_LIMIT_MAX=10
-   ```
-
-4. **Configure Frontend**
-   ```bash
-   cd kiro/specs/content-quality-reviewer/frontend
-   cp .env.example .env
-   # Edit .env: VITE_API_ENDPOINT=https://your-project.vercel.app
-   npm install
-   npm run dev
-   ```
-
-**For detailed step-by-step instructions, see [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)**
-
-## 📖 Documentation
-
-- **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - Complete deployment guide (START HERE)
-
-## 🏛️ Project Structure
-
-```
-content-quality-reviewer/
-├── api/                        # Vercel serverless functions
-│   ├── analyze.js             # Main content analysis endpoint
-│   ├── history.js             # User history endpoint
-│   ├── analysis/
-│   │   └── [id].js           # Get specific analysis
-│   └── auth/
-│       ├── login.js          # Login endpoint
-│       └── signup.js         # Signup endpoint
-├── lib/                       # Shared libraries
-│   ├── auth.js               # JWT authentication
-│   ├── storage.js            # MongoDB operations
-│   ├── rate-limit.js         # Rate limiting
-│   ├── openai-client.js      # OpenAI integration
-│   ├── nlp-utils.js          # NLP utilities
-│   └── analyzers/            # Content analyzers
-│       ├── structure-analyzer.js
-│       ├── tone-analyzer.js
-│       ├── accessibility-checker.js
-│       ├── platform-adapter.js
-│       └── score-merger.js
-├── .kiro/specs/content-quality-reviewer/
-│   └── frontend/             # React frontend
-│       ├── src/
-│       │   ├── services/
-│       │   │   ├── authService.ts
-│       │   │   └── apiService.ts
-│       │   └── components/
-│       └── .env
-├── vercel.json               # Vercel configuration
-└── package.json              # Dependencies
-```
-
-## 🧪 Testing
-
+1. **Clone the repository**
 ```bash
-# Run all tests
-npm test
-
-# Run specific test file
-npm test api/analyze.test.js
-
-# Run with coverage
-npm test -- --coverage
+git clone https://github.com/yourusername/contentlens-ai.git
+cd contentlens-ai
 ```
 
-## 📊 Cost Estimation
-
-Monthly costs for 1,000 analyses:
-
-- Vercel Functions: ~$0 (Hobby plan includes 100GB-hours)
-- Vercel KV: ~$0 (Hobby plan includes 256MB)
-- OpenAI API (GPT-4): ~$30-50 (depends on usage)
-
-**Total: ~$30-50/month** (mostly OpenAI costs)
-
-## 🔒 Security
-
-- JWT token authentication
-- bcrypt password hashing
-- Rate limiting (10 requests/minute)
-- CORS configuration
-- Vercel KV encryption at rest
-- HTTPS by default
-
-## 🛠️ Development
-
-### Local Development
-
+2. **Install dependencies**
 ```bash
-# Install dependencies
+# Install root dependencies
 npm install
 
-# Run backend locally
-vercel dev
+# Install frontend dependencies
+cd frontend
+npm install
+cd ..
+```
 
-# Run frontend (in another terminal)
-cd .kiro/specs/content-quality-reviewer/frontend
+3. **Configure environment variables**
+
+Create a `.env` file in the root directory:
+
+```env
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-here
+
+# Application Configuration
+MAX_CONTENT_LENGTH=2000
+
+# Rate Limiting
+RATE_LIMIT_WINDOW=60
+RATE_LIMIT_MAX=10
+
+# MongoDB Configuration
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database
+
+# Groq AI Configuration
+GROQ_API_KEY=your-groq-api-key-here
+
+# Storage Configuration
+ANALYSIS_TTL_DAYS=30
+```
+
+Create `frontend/.env`:
+
+```env
+VITE_API_ENDPOINT=http://localhost:3001
+```
+
+4. **Start the application**
+
+```bash
+# Terminal 1: Start backend server
+node server.js
+
+# Terminal 2: Start frontend
+cd frontend
 npm run dev
 ```
 
-### Environment Variables
+5. **Access the application**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:3001
 
-Backend (Vercel):
-- `MONGODB_URI`: MongoDB Atlas connection string
-- `OPENAI_API_KEY`: OpenAI API key
-- `JWT_SECRET`: Secure random string for JWT signing
-- `MAX_CONTENT_LENGTH`: Maximum content length in words (default: 2000)
-- `RATE_LIMIT_WINDOW`: Rate limit window in seconds (default: 60)
-- `RATE_LIMIT_MAX`: Max requests per window (default: 10)
-- `OPENAI_MODEL`: OpenAI model to use (default: gpt-4-turbo-preview)
-- `OPENAI_MAX_TOKENS`: Max tokens for OpenAI responses (default: 2000)
-- `OPENAI_TEMPERATURE`: Temperature for OpenAI responses (default: 0.3)
+## 🎯 Usage
 
-Frontend (.env):
-- `VITE_API_ENDPOINT`: Your Vercel deployment URL
+1. **Sign Up**: Create an account with email and password
+2. **Analyze Content**: 
+   - Paste your content
+   - Select target platform (Blog, LinkedIn, Twitter, Medium)
+   - Choose content intent (Inform, Educate, Persuade)
+   - Click "Analyze Content"
+3. **Review Results**: Get comprehensive scores and actionable suggestions
+4. **View History**: Access past analyses from the History page
 
-## 🐛 Troubleshooting
-
-### MongoDB Connection Errors
-- Verify `MONGODB_URI` is set correctly in Vercel environment variables
-- Check MongoDB Atlas cluster is running
-- Ensure Network Access allows 0.0.0.0/0 (for Vercel)
-- Verify database user credentials are correct
-
-### OpenAI API Errors
-- Verify `OPENAI_API_KEY` is set correctly
-- Check API key has sufficient credits
-- Review OpenAI usage dashboard
-
-### Authentication Issues
-- Ensure `JWT_SECRET` is set
-- Check token is included in Authorization header
-- Verify token hasn't expired (24 hour expiry)
-
-### Rate Limit Errors
-- Default: 10 requests per 60 seconds
-- Adjust `RATE_LIMIT_MAX` and `RATE_LIMIT_WINDOW` if needed
-
-### CORS Errors
-- Verify `vercel.json` has CORS headers configured
-- Check frontend `VITE_API_ENDPOINT` is correct
-- Clear browser cache
-- Clear browser cache
-
-**For more troubleshooting, see [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md#troubleshooting)**
-
-## 📈 Monitoring
-
-### Vercel Dashboard
-- **Functions**: Monitor execution time and errors
-- **Logs**: View real-time function logs
-- **Analytics**: Track usage metrics
-- **Storage**: Monitor KV usage
-
-### Key Metrics
-- Function execution time
-- Error rates
-- KV storage usage
-- OpenAI API costs
-
-## 🔄 Deployment
-
-### Automatic Deployment
-Push to your main branch and Vercel automatically deploys.
-
-### Manual Deployment
-```bash
-vercel --prod
-```
-
-### Rollback
-```bash
-vercel rollback
-```
-
-Or use Vercel Dashboard → Deployments → Promote previous deployment
-
-## 📝 API Endpoints
+## 📊 API Endpoints
 
 ### Authentication
-- `POST /api/auth/signup` - Create new account
-- `POST /api/auth/login` - Login to existing account
+- `POST /api/auth/signup` - Create new user account
+- `POST /api/auth/login` - Login existing user
 
 ### Content Analysis
-- `POST /api/analyze` - Analyze content (requires auth)
-- `GET /api/analysis/:id` - Get specific analysis (requires auth)
-- `GET /api/history?limit=10` - Get analysis history (requires auth)
+- `POST /api/analyze` - Analyze content (requires authentication)
+- `GET /api/history` - Get user's analysis history
+- `GET /api/analysis/:id` - Get specific analysis by ID
 
-All authenticated endpoints require:
+## 🏗️ Project Structure
+
 ```
-Authorization: Bearer <jwt_token>
+contentlens-ai/
+├── api/                    # API endpoints
+│   ├── auth/              # Authentication routes
+│   ├── analyze.js         # Content analysis endpoint
+│   └── history.js         # History endpoint
+├── lib/                   # Backend libraries
+│   ├── analyzers/         # Content analyzers
+│   ├── auth.js           # Auth utilities
+│   ├── storage.js        # MongoDB operations
+│   ├── groq-client.js    # AI client
+│   └── nlp-utils.js      # NLP utilities
+├── frontend/             # React frontend
+│   ├── src/
+│   │   ├── components/   # UI components
+│   │   └── services/     # API services
+│   └── package.json
+├── server.js            # Express server
+└── package.json         # Root dependencies
 ```
+
+## 🔒 Security
+
+- JWT-based authentication
+- bcrypt password hashing
+- Rate limiting (10 requests/minute)
+- Environment variable protection
+- CORS enabled for frontend
+
+## 🚧 Future Enhancements
+
+- Browser extension for in-place analysis
+- Team collaboration features
+- Multi-language support
+- A/B testing suggestions
+- Content calendar integration
+- Public API for third-party integrations
 
 ## 📝 License
 
-This project is licensed under the MIT License.
+MIT
 
-## 🤝 Contributing
+## 👨‍💻 Author
 
-Contributions are welcome! Please read the contributing guidelines before submitting PRs.
+Built for hackathon submission
 
-## 📞 Support
+## 🙏 Acknowledgments
 
-For issues or questions:
-1. Check Vercel function logs
-2. Review [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
-3. Open an issue on GitHub
-
----
-
-**Built with ❤️ using Vercel, OpenAI, and React**
+- Groq AI for fast LLM inference
+- MongoDB for reliable data storage
+- shadcn/ui for beautiful components
