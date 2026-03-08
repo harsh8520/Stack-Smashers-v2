@@ -169,7 +169,7 @@ export default function ResultsDashboard({ onNavigate, content, onEditContent, o
         </div>
 
         {/* Overall Score */}
-        <div className="bg-white border border-[#E5E7EB] rounded-lg p-8 mb-6">
+        <div className="bg-white border border-[#E5E7EB] rounded-lg p-8 mb-6 hover:shadow-xl transition-all duration-300">
           <div className="flex items-center gap-8">
             <div className="relative">
               <svg className="w-40 h-40 transform -rotate-90">
@@ -218,7 +218,7 @@ export default function ResultsDashboard({ onNavigate, content, onEditContent, o
         {/* Dimension Scores */}
         <div className="grid grid-cols-2 gap-6 mb-6">
           {dimensionScoresArray.map((dimension) => (
-            <div key={dimension.name} className="bg-white border border-[#E5E7EB] rounded-lg p-6">
+            <div key={dimension.name} className="bg-white border border-[#E5E7EB] rounded-lg p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
               <div className="flex items-center justify-between mb-3">
                 <span className="font-semibold">{dimension.name}</span>
                 <span className={`text-2xl font-bold ${getScoreColor(dimension.score)}`}>
@@ -227,7 +227,7 @@ export default function ResultsDashboard({ onNavigate, content, onEditContent, o
               </div>
               <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div 
-                  className={`h-full ${dimension.color}`}
+                  className={`h-full ${dimension.color} transition-all duration-500`}
                   style={{ width: `${dimension.score}%` }}
                 ></div>
               </div>
@@ -439,14 +439,14 @@ export default function ResultsDashboard({ onNavigate, content, onEditContent, o
 
         <div className="grid grid-cols-2 gap-6 mb-6">
           {/* Strengths */}
-          <div className="bg-white border border-[#E5E7EB] rounded-lg p-6">
+          <div className="bg-white border border-[#E5E7EB] rounded-lg p-6 hover:shadow-lg hover:border-green-300 transition-all duration-300">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="w-5 h-5 text-green-600" />
               <h3 className="font-semibold">Strengths</h3>
             </div>
             <ul className="space-y-3">
               {strengths.map((strength, index) => (
-                <li key={index} className="flex items-start gap-2 text-sm">
+                <li key={index} className="flex items-start gap-2 text-sm hover:bg-green-50 p-2 rounded transition-colors duration-200">
                   <div className="w-1.5 h-1.5 bg-green-600 rounded-full mt-2 flex-shrink-0"></div>
                   <span>{strength}</span>
                 </li>
@@ -455,14 +455,14 @@ export default function ResultsDashboard({ onNavigate, content, onEditContent, o
           </div>
 
           {/* Areas for Improvement */}
-          <div className="bg-white border border-[#E5E7EB] rounded-lg p-6">
+          <div className="bg-white border border-[#E5E7EB] rounded-lg p-6 hover:shadow-lg hover:border-orange-300 transition-all duration-300">
             <div className="flex items-center gap-2 mb-4">
               <AlertCircle className="w-5 h-5 text-orange-600" />
               <h3 className="font-semibold">Areas for Improvement</h3>
             </div>
             <ul className="space-y-3">
               {improvements.map((improvement, index) => (
-                <li key={index} className="flex items-start gap-2 text-sm">
+                <li key={index} className="flex items-start gap-2 text-sm hover:bg-orange-50 p-2 rounded transition-colors duration-200">
                   <div className="w-1.5 h-1.5 bg-orange-600 rounded-full mt-2 flex-shrink-0"></div>
                   <span>{improvement}</span>
                 </li>
@@ -473,7 +473,7 @@ export default function ResultsDashboard({ onNavigate, content, onEditContent, o
 
         {/* Readability Metrics Card */}
         {readability && (
-          <div className="bg-white border border-[#E5E7EB] rounded-lg p-6 mb-6">
+          <div className="bg-white border border-[#E5E7EB] rounded-lg p-6 mb-6 hover:shadow-lg hover:border-blue-300 transition-all duration-300">
             <div className="flex items-center gap-2 mb-4">
               <BookOpen className="w-5 h-5 text-[#2563EB]" />
               <h3 className="font-semibold">Readability Metrics</h3>
@@ -481,7 +481,7 @@ export default function ResultsDashboard({ onNavigate, content, onEditContent, o
             
             <div className="grid grid-cols-3 gap-6">
               {/* Flesch-Kincaid Score with Gauge */}
-              <div className="text-center">
+              <div className="text-center hover:scale-105 transition-transform duration-300">
                 <div className="relative inline-block mb-3">
                   <svg className="w-32 h-32 transform -rotate-90">
                     <circle
@@ -526,7 +526,7 @@ export default function ResultsDashboard({ onNavigate, content, onEditContent, o
               </div>
 
               {/* Grade Level */}
-              <div className="text-center">
+              <div className="text-center hover:scale-105 transition-transform duration-300">
                 <div className={`inline-flex items-center justify-center w-32 h-32 rounded-full border-8 mb-3 ${
                   readability.gradeLevel <= 12 ? 'border-green-200 bg-green-50' :
                   readability.gradeLevel <= 16 ? 'border-orange-200 bg-orange-50' : 'border-red-200 bg-red-50'
@@ -549,7 +549,7 @@ export default function ResultsDashboard({ onNavigate, content, onEditContent, o
               </div>
 
               {/* Reading Time */}
-              <div className="text-center">
+              <div className="text-center hover:scale-105 transition-transform duration-300">
                 <div className="inline-flex items-center justify-center w-32 h-32 rounded-full border-8 border-blue-200 bg-blue-50 mb-3">
                   <div className="text-center">
                     <Clock className="w-8 h-8 text-blue-600 mx-auto mb-1" />
