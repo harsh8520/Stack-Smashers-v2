@@ -4,12 +4,11 @@ An intelligent content analysis system that helps creators improve their digital
 
 ## 🏗️ Architecture
 
-- **Frontend**: React + Vite
-- **Backend**: Vercel Serverless Functions
+- **Frontend**: React + Vite + TypeScript
+- **Backend**: Vercel Serverless Functions (Node.js)
 - **Authentication**: JWT-based authentication
-- **AI Analysis**: OpenAI GPT-4
-- **Database**: Vercel KV (Redis)
-- **NLP**: Sentiment library + OpenAI
+- **AI Analysis**: OpenAI GPT-4 Turbo
+- **Database**: MongoDB Atlas
 - **Deployment**: Vercel
 
 ## ✨ Features
@@ -45,18 +44,20 @@ An intelligent content analysis system that helps creators improve their digital
 
 **Quick version:**
 
-1. **Deploy Backend**
+1. **Set up MongoDB Atlas**
+   - Create free cluster at [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas)
+   - Create database user and get connection string
+
+2. **Deploy Backend**
    ```bash
+   npm install -g vercel
    vercel login
    vercel --prod
    ```
 
-2. **Set Up Database**
-   - Create Vercel KV database in dashboard
-   - Connect to your project
-
-3. **Configure Environment Variables**
+3. **Configure Environment Variables in Vercel**
    ```bash
+   MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/content_quality_reviewer
    OPENAI_API_KEY=sk-your-key
    JWT_SECRET=<generate-random>
    MAX_CONTENT_LENGTH=2000
@@ -66,7 +67,8 @@ An intelligent content analysis system that helps creators improve their digital
 
 4. **Configure Frontend**
    ```bash
-   cd .kiro/specs/content-quality-reviewer/frontend
+   cd kiro/specs/content-quality-reviewer/frontend
+   cp .env.example .env
    # Edit .env: VITE_API_ENDPOINT=https://your-project.vercel.app
    npm install
    npm run dev
@@ -92,7 +94,7 @@ content-quality-reviewer/
 │       └── signup.js         # Signup endpoint
 ├── lib/                       # Shared libraries
 │   ├── auth.js               # JWT authentication
-│   ├── storage.js            # Vercel KV operations
+│   ├── storage.js            # MongoDB operations
 │   ├── rate-limit.js         # Rate limiting
 │   ├── openai-client.js      # OpenAI integration
 │   ├── nlp-utils.js          # NLP utilities
@@ -164,19 +166,27 @@ npm run dev
 
 ### Environment Variables
 
-Backend:
+Backend (Vercel):
+- `MONGODB_URI`: MongoDB Atlas connection string
 - `OPENAI_API_KEY`: OpenAI API key
 - `JWT_SECRET`: Secure random string for JWT signing
-- `KV_REST_API_URL`: Auto-configured by Vercel KV
-- `KV_REST_API_TOKEN`: Auto-configured by Vercel KV
 - `MAX_CONTENT_LENGTH`: Maximum content length in words (default: 2000)
 - `RATE_LIMIT_WINDOW`: Rate limit window in seconds (default: 60)
 - `RATE_LIMIT_MAX`: Max requests per window (default: 10)
+- `OPENAI_MODEL`: OpenAI model to use (default: gpt-4-turbo-preview)
+- `OPENAI_MAX_TOKENS`: Max tokens for OpenAI responses (default: 2000)
+- `OPENAI_TEMPERATURE`: Temperature for OpenAI responses (default: 0.3)
 
 Frontend (.env):
 - `VITE_API_ENDPOINT`: Your Vercel deployment URL
 
 ## 🐛 Troubleshooting
+
+### MongoDB Connection Errors
+- Verify `MONGODB_URI` is set correctly in Vercel environment variables
+- Check MongoDB Atlas cluster is running
+- Ensure Network Access allows 0.0.0.0/0 (for Vercel)
+- Verify database user credentials are correct
 
 ### OpenAI API Errors
 - Verify `OPENAI_API_KEY` is set correctly
@@ -186,16 +196,16 @@ Frontend (.env):
 ### Authentication Issues
 - Ensure `JWT_SECRET` is set
 - Check token is included in Authorization header
-- Verify token hasn't expired (7 day expiry)
+- Verify token hasn't expired (24 hour expiry)
 
 ### Rate Limit Errors
 - Default: 10 requests per 60 seconds
 - Adjust `RATE_LIMIT_MAX` and `RATE_LIMIT_WINDOW` if needed
-- Check Vercel KV usage
 
 ### CORS Errors
 - Verify `vercel.json` has CORS headers configured
 - Check frontend `VITE_API_ENDPOINT` is correct
+- Clear browser cache
 - Clear browser cache
 
 **For more troubleshooting, see [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md#troubleshooting)**

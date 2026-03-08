@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/**/*.js": {
-      "maxDuration": 10,
-      "memory": 1024
-    }
-  },
   "headers": [
     {
       "source": "/api/(.*)",
@@ -27,12 +21,6 @@
           "value": "86400"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ]
 }

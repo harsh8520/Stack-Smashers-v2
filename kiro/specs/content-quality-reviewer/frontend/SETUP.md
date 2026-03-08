@@ -1,298 +1,382 @@
 # Frontend Setup Guide
 
-This guide will help you set up and run the Content Quality Reviewer frontend application with AWS backend integration.
+Quick guide to set up and run the Content Quality Reviewer frontend.
+
+---
 
 ## Prerequisites
 
-- Node.js 18+ installed
-- npm or yarn package manager
-- AWS backend deployed (CDK stack)
-- CDK stack output values
+- Node.js 18+
+- Backend deployed to Vercel (see main [DEPLOYMENT_GUIDE.md](../../../DEPLOYMENT_GUIDE.md))
+- Backend URL from Vercel deployment
 
-## Step 1: Install Dependencies
+---
+
+## Quick Setup
+
+### 1. Install Dependencies
 
 ```bash
-cd .kiro/specs/content-quality-reviewer/frontend
 npm install
 ```
 
-## Step 2: Configure AWS Settings
+### 2. Configure Environment
 
-Create a `.env` file in the frontend directory with your AWS configuration:
-
+Copy the example environment file:
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and add your values from the CDK stack outputs:
-
+Edit `.env` and set your backend URL:
 ```env
-VITE_AWS_REGION=us-east-1
-VITE_USER_POOL_ID=us-east-1_xxxxxxxxx
-VITE_USER_POOL_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxx
-VITE_API_ENDPOINT=https://xxxxx.execute-api.us-east-1.amazonaws.com/prod
+VITE_API_ENDPOINT=https://your-backend-url.vercel.app
 ```
 
-### Getting CDK Output Values
-
-After deploying the backend with `cdk deploy`, you'll see outputs like:
-
-```
-Outputs:
-ContentReviewerStack.ApiEndpoint = https://xxxxx.execute-api.us-east-1.amazonaws.com/prod/
-ContentReviewerStack.UserPoolId = us-east-1_xxxxxxxxx
-ContentReviewerStack.UserPoolClientId = xxxxxxxxxxxxxxxxxxxxxxxxxx
-ContentReviewerStack.Region = us-east-1
-```
-
-Use these values in your `.env` file.
-
-## Step 3: Run Development Server
+### 3. Run Development Server
 
 ```bash
 npm run dev
 ```
 
-The application will start at `http://localhost:5173`
+Frontend will be available at: [http://localhost:5173](http://localhost:5173)
 
-## Step 4: Create a Test User
+---
 
-Before you can log in, create a test user in Cognito:
-
-### Option A: Using AWS CLI
-
-```bash
-# Create user
-aws cognito-idp admin-create-user \
-  --user-pool-id YOUR_USER_POOL_ID \
-  --username testuser@example.com \
-  --user-attributes Name=email,Value=testuser@example.com \
-  --temporary-password TempPassword123! \
-  --message-action SUPPRESS
-
-# Set permanent password
-aws cognito-idp admin-set-user-password \
-  --user-pool-id YOUR_USER_POOL_ID \
-  --username testuser@example.com \
-  --password MySecurePassword123! \
-  --permanent
-```
-
-### Option B: Using AWS Console
-
-1. Go to AWS Console → Cognito
-2. Select your User Pool
-3. Click "Create user"
-4. Enter email and temporary password
-5. User will need to change password on first login
-
-### Option C: Sign Up Through the App
-
-1. Open the app at `http://localhost:5173`
-2. Click "Sign up"
-3. Fill in the form
-4. Check your email for confirmation code
-5. Enter the code to verify your account
-
-## Step 5: Test the Application
-
-1. Navigate to `http://localhost:5173`
-2. Click "Get Started" or "Login"
-3. Sign in with your credentials
-4. You should be redirected to the Dashboard
-5. Paste some content and click "Analyze Content"
-6. Wait for the AI analysis to complete
-7. View your results on the Results Dashboard
-8. Check your history in the History page
-
-## Features
-
-### Authentication
-- Sign up with email verification
-- Sign in with email and password
-- Secure session management with Cognito
-- Automatic token refresh
-
-### Content Analysis
-- Paste or type content (up to 2000 words)
-- Select target platform (Blog, LinkedIn, Twitter, Medium)
-- Choose content intent (Inform, Educate, Persuade)
-- Real-time AI analysis using Amazon Bedrock (Nova Sonic)
-- Comprehensive scoring across multiple dimensions
-
-### Results Dashboard
-- Overall quality score (0-100)
-- Dimension scores:
-  - Structure
-  - Tone
-  - Accessibility
-  - Platform Alignment
-- Strengths and improvements
-- Actionable recommendations
-- Explainable AI reasoning
-
-### History
-- View all past analyses
-- Track score improvements over time
-- Analytics and trends
-- Export reports (coming soon)
-
-## Troubleshooting
-
-### Issue: "Failed to analyze content"
-
-**Possible causes:**
-- Backend API not deployed
-- Incorrect API endpoint in `.env`
-- Cognito authentication failed
-- Network connectivity issues
-
-**Solutions:**
-1. Verify backend is deployed: `aws cloudformation describe-stacks --stack-name ContentReviewerStack`
-2. Check `.env` file has correct values
-3. Ensure you're logged in
-4. Check browser console for detailed errors
-
-### Issue: "User is not authenticated"
-
-**Solutions:**
-1. Sign out and sign in again
-2. Clear browser cache and cookies
-3. Verify Cognito User Pool ID and Client ID in `.env`
-4. Check that user exists in Cognito User Pool
-
-### Issue: "Confirmation code invalid"
-
-**Solutions:**
-1. Request a new confirmation code
-2. Check email spam folder
-3. Verify email address is correct
-4. Try creating user manually via AWS Console
-
-### Issue: CORS errors
-
-**Solutions:**
-1. Verify API Gateway has CORS enabled
-2. Check that frontend origin is allowed
-3. Ensure Authorization header is included in CORS config
-4. Redeploy backend if CORS settings were changed
-
-### Issue: "Network Error" or timeout
-
-**Solutions:**
-1. Check internet connection
-2. Verify API endpoint is accessible
-3. Check AWS service quotas
-4. Increase Lambda timeout if needed
-5. Check CloudWatch logs for backend errors
-
-## Development
-
-### Project Structure
-
-```
-frontend/
-├── src/
-│   ├── components/        # React components
-│   │   ├── Dashboard.tsx
-│   │   ├── Login.tsx
-│   │   ├── SignUp.tsx
-│   │   ├── ProcessingState.tsx
-│   │   ├── ResultsDashboard.tsx
-│   │   └── History.tsx
-│   ├── services/          # API service layer
-│   │   └── apiService.ts
-│   ├── aws-exports.ts     # AWS Amplify configuration
-│   ├── App.tsx            # Main app component
-│   └── main.tsx           # Entry point
-├── .env                   # Environment variables (not in git)
-├── .env.example           # Example environment file
-└── package.json
-```
-
-### API Service
-
-The `apiService.ts` file provides functions to interact with the backend:
-
-- `analyzeContent(request)` - Analyze content
-- `getAnalysisById(id)` - Get specific analysis
-- `getUserHistory(limit)` - Get user's analysis history
-- `getCurrentUser()` - Get current authenticated user
-- `signOut()` - Sign out user
-
-### Adding New Features
-
-1. Create new component in `src/components/`
-2. Add route in `App.tsx`
-3. Update navigation in sidebar
-4. Add API calls in `apiService.ts` if needed
-
-## Building for Production
+## Build for Production
 
 ```bash
 npm run build
 ```
 
-The build output will be in the `dist/` directory.
+Preview production build:
+```bash
+npm run preview
+```
 
-## Deployment
+---
 
-### Option A: AWS Amplify Hosting
+## Deploy to Vercel
 
-1. Install Amplify CLI: `npm install -g @aws-amplify/cli`
-2. Initialize Amplify: `amplify init`
-3. Add hosting: `amplify add hosting`
-4. Publish: `amplify publish`
+### Option 1: Via Vercel CLI
 
-### Option B: S3 + CloudFront
+```bash
+# Install Vercel CLI (if not already installed)
+npm install -g vercel
 
-1. Build the app: `npm run build`
-2. Create S3 bucket
-3. Upload `dist/` contents to S3
-4. Create CloudFront distribution
-5. Point to S3 bucket
+# Deploy
+vercel
 
-### Option C: Vercel/Netlify
+# Add environment variable
+vercel env add VITE_API_ENDPOINT
+# Value: Your backend URL
+# Environment: Production, Preview, Development
 
-1. Connect your Git repository
-2. Set build command: `npm run build`
-3. Set output directory: `dist`
-4. Add environment variables
-5. Deploy
+# Deploy to production
+vercel --prod
+```
+
+### Option 2: Via Vercel Dashboard
+
+1. Go to [https://vercel.com/new](https://vercel.com/new)
+2. Import your Git repository
+3. Set Framework Preset: **Vite**
+4. Set Root Directory: `kiro/specs/content-quality-reviewer/frontend`
+5. Add Environment Variable:
+   - Name: `VITE_API_ENDPOINT`
+   - Value: Your backend URL
+6. Click "Deploy"
+
+---
 
 ## Environment Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `VITE_AWS_REGION` | AWS region | `us-east-1` |
-| `VITE_USER_POOL_ID` | Cognito User Pool ID | `us-east-1_abc123` |
-| `VITE_USER_POOL_CLIENT_ID` | Cognito Client ID | `1234567890abcdef` |
-| `VITE_API_ENDPOINT` | API Gateway endpoint | `https://api.example.com/prod` |
+### Required
 
-## Security Notes
+- `VITE_API_ENDPOINT` - Your backend API URL (e.g., `https://your-backend.vercel.app`)
 
-- Never commit `.env` file to version control
-- Use environment-specific configurations
-- Rotate credentials regularly
-- Enable MFA for production users
-- Use HTTPS in production
-- Implement rate limiting
-- Monitor CloudWatch logs for suspicious activity
+### Optional
 
-## Support
+None currently. All configuration is done via the backend.
 
-For issues or questions:
-1. Check CloudWatch logs for backend errors
-2. Review browser console for frontend errors
-3. Verify AWS service quotas
-4. Check IAM permissions
+---
 
-## Next Steps
+## Project Structure
 
-- Enable social login (Google, GitHub)
-- Add export to PDF functionality
-- Implement real-time collaboration
-- Add content templates
-- Create mobile app
-- Add analytics dashboard
-- Implement A/B testing
+```
+frontend/
+├── src/
+│   ├── components/        # React components
+│   │   ├── ui/           # Reusable UI components (shadcn/ui)
+│   │   ├── Dashboard.tsx # Main dashboard
+│   │   ├── Login.tsx     # Login page
+│   │   ├── SignUp.tsx    # Signup page
+│   │   └── ...
+│   ├── services/         # API service layer
+│   │   ├── apiService.ts # Content analysis API
+│   │   └── authService.ts # Authentication API
+│   ├── styles/           # Global styles
+│   ├── App.tsx           # Main app component
+│   └── main.tsx          # Entry point
+├── public/               # Static assets
+├── .env                  # Environment variables (create from .env.example)
+├── .env.example          # Environment variables template
+├── package.json          # Dependencies
+├── vite.config.ts        # Vite configuration
+└── tsconfig.json         # TypeScript configuration
+```
+
+---
+
+## Available Scripts
+
+```bash
+# Development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Type checking
+npm run type-check
+
+# Lint code
+npm run lint
+```
+
+---
+
+## Features
+
+### Authentication
+- User signup with email/password
+- User login with JWT tokens
+- Automatic token refresh
+- Protected routes
+
+### Content Analysis
+- Multi-platform support (Blog, LinkedIn, Twitter, Medium)
+- Content intent selection (Informative, Promotional, Educational, etc.)
+- Real-time analysis with OpenAI
+- Detailed scoring across multiple dimensions
+- Actionable suggestions
+
+### Dashboard
+- Analysis history
+- Score visualization with charts
+- Detailed dimension breakdowns
+- Suggestion lists
+- Export capabilities
+
+### UI Components
+- Built with shadcn/ui
+- Tailwind CSS styling
+- Responsive design
+- Dark mode support
+- Accessible components
+
+---
+
+## Troubleshooting
+
+### "Network Error" or "Failed to fetch"
+
+**Problem:** Frontend can't connect to backend
+
+**Solutions:**
+1. Check `VITE_API_ENDPOINT` in `.env` is correct
+2. Verify backend is deployed and accessible
+3. Check browser console for CORS errors
+4. Ensure backend URL doesn't have trailing slash
+
+### "Unauthorized" errors
+
+**Problem:** Authentication token issues
+
+**Solutions:**
+1. Log out and log in again
+2. Clear browser localStorage
+3. Check JWT_SECRET is set in backend environment variables
+4. Verify token hasn't expired (default: 24 hours)
+
+### Build errors
+
+**Problem:** TypeScript or build errors
+
+**Solutions:**
+1. Delete `node_modules` and reinstall: `rm -rf node_modules && npm install`
+2. Clear Vite cache: `rm -rf node_modules/.vite`
+3. Check TypeScript errors: `npm run type-check`
+
+### Styling issues
+
+**Problem:** Tailwind CSS not working
+
+**Solutions:**
+1. Ensure Tailwind CSS is properly configured in `tailwind.config.js`
+2. Check `postcss.config.js` exists
+3. Restart dev server: `npm run dev`
+
+---
+
+## API Integration
+
+The frontend communicates with the backend via REST API:
+
+### Authentication Endpoints
+
+```typescript
+// Signup
+POST /api/auth/signup
+Body: { email: string, password: string }
+Response: { token: string, user: { id: string, email: string } }
+
+// Login
+POST /api/auth/login
+Body: { email: string, password: string }
+Response: { token: string, user: { id: string, email: string } }
+```
+
+### Analysis Endpoints
+
+```typescript
+// Analyze content
+POST /api/analyze
+Headers: { Authorization: "Bearer <token>" }
+Body: {
+  content: string,
+  targetPlatform: string,
+  contentIntent: string
+}
+Response: {
+  analysisId: string,
+  overallScore: number,
+  dimensionScores: object,
+  suggestions: string[],
+  ...
+}
+
+// Get analysis by ID
+GET /api/analysis/:id
+Headers: { Authorization: "Bearer <token>" }
+Response: { analysisId, userId, timestamp, ... }
+
+// Get user history
+GET /api/history?limit=10
+Headers: { Authorization: "Bearer <token>" }
+Response: {
+  analyses: array,
+  total: number,
+  hasMore: boolean
+}
+```
+
+---
+
+## Tech Stack
+
+- **Framework:** React 18
+- **Build Tool:** Vite
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **UI Components:** shadcn/ui
+- **State Management:** React Hooks
+- **HTTP Client:** Fetch API
+- **Charts:** Recharts
+- **Icons:** Lucide React
+- **Routing:** React Router (if applicable)
+
+---
+
+## Development Tips
+
+### Hot Module Replacement (HMR)
+
+Vite provides fast HMR. Changes to components will reflect immediately without full page reload.
+
+### TypeScript
+
+The project uses TypeScript for type safety. Run type checking:
+```bash
+npm run type-check
+```
+
+### Component Development
+
+UI components are based on shadcn/ui. To add new components:
+```bash
+npx shadcn-ui@latest add <component-name>
+```
+
+### API Service Layer
+
+All API calls go through service files in `src/services/`:
+- `authService.ts` - Authentication
+- `apiService.ts` - Content analysis
+
+This provides a clean separation between UI and API logic.
+
+---
+
+## Performance Optimization
+
+### Production Build
+
+The production build is optimized with:
+- Code splitting
+- Tree shaking
+- Minification
+- Asset optimization
+
+### Lazy Loading
+
+Consider lazy loading routes and heavy components:
+```typescript
+const Dashboard = lazy(() => import('./components/Dashboard'));
+```
+
+### Caching
+
+API responses can be cached in localStorage or React Query for better performance.
+
+---
+
+## Security Considerations
+
+### Token Storage
+
+JWT tokens are stored in localStorage. For production:
+- Consider using httpOnly cookies
+- Implement token refresh mechanism
+- Add CSRF protection
+
+### API Calls
+
+All API calls include:
+- Authorization headers
+- HTTPS only
+- Error handling
+- Request validation
+
+---
+
+## Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+
+---
+
+## Need Help?
+
+📖 **Main Deployment Guide:** [../../../DEPLOYMENT_GUIDE.md](../../../DEPLOYMENT_GUIDE.md)  
+🐛 **Backend Issues:** Check Vercel function logs  
+💬 **Frontend Issues:** Check browser console
+
+---
+
+**Happy coding!** 🚀

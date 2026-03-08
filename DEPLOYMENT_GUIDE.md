@@ -1,39 +1,111 @@
-# Complete Deployment Guide
+# Complete Deployment Guide - MongoDB + Vercel
 
-This is the **ONLY** guide you need to deploy the Content Quality Reviewer application from start to finish.
+This is the complete guide to deploy the Content Quality Reviewer application with MongoDB Atlas and Vercel.
 
 ---
 
 ## Table of Contents
 
 1. [Prerequisites](#prerequisites)
-2. [Step 1: Prepare Your Project](#step-1-prepare-your-project)
-3. [Step 2: Deploy Backend to Vercel](#step-2-deploy-backend-to-vercel)
-4. [Step 3: Set Up Vercel KV Database](#step-3-set-up-vercel-kv-database)
-5. [Step 4: Configure Environment Variables](#step-4-configure-environment-variables)
-6. [Step 5: Test Backend Deployment](#step-5-test-backend-deployment)
-7. [Step 6: Configure Frontend](#step-6-configure-frontend)
-8. [Step 7: Run Frontend Locally](#step-7-run-frontend-locally)
-9. [Step 8: Test Complete Application](#step-8-test-complete-application)
-10. [Troubleshooting](#troubleshooting)
-11. [Monitoring & Maintenance](#monitoring--maintenance)
+2. [Part 1: MongoDB Atlas Setup](#part-1-mongodb-atlas-setup)
+3. [Part 2: Backend Deployment (Vercel)](#part-2-backend-deployment-vercel)
+4. [Part 3: Frontend Setup](#part-3-frontend-setup)
+5. [Testing & Verification](#testing--verification)
+6. [Troubleshooting](#troubleshooting)
+7. [Monitoring & Maintenance](#monitoring--maintenance)
 
 ---
 
 ## Prerequisites
 
-Before you start, make sure you have:
+Before starting, ensure you have:
 
-### Required Accounts
-- ✅ **Vercel Account** - Sign up at [vercel.com](https://vercel.com) (free tier works)
-- ✅ **OpenAI Account** - Get API key at [platform.openai.com](https://platform.openai.com)
+- **Node.js 18+** installed ([Download](https://nodejs.org/))
+- **Git** installed
+- **Vercel account** (free tier works) - [Sign up](https://vercel.com/signup)
+- **MongoDB Atlas account** (free tier works) - [Sign up](https://www.mongodb.com/cloud/atlas/register)
+- **OpenAI API key** - [Get one here](https://platform.openai.com/api-keys)
+- **Terminal/Command Line** access
 
-### Required Software
-- ✅ **Node.js 18+** - Check with: `node --version`
-- ✅ **npm** - Comes with Node.js
-- ✅ **Git** - For version control
+**Estimated Total Time: 20-25 minutes**
 
-### Install Vercel CLI (Optional but Recommended)
+---
+
+## Part 1: MongoDB Atlas Setup
+
+### Step 1.1: Create MongoDB Atlas Cluster
+
+1. **Log in to MongoDB Atlas**
+   - Go to [https://cloud.mongodb.com/](https://cloud.mongodb.com/)
+   - Sign in or create a new account
+
+2. **Create a New Project** (if you don't have one)
+   - Click "New Project"
+   - Name it: `content-quality-reviewer`
+   - Click "Create Project"
+
+3. **Create a Cluster**
+   - Click "Build a Database"
+   - Select **M0 FREE** tier
+   - Choose your preferred cloud provider and region (closest to your users)
+   - Cluster Name: `content-quality-cluster` (or any name you prefer)
+   - Click "Create Cluster"
+
+**Wait 3-5 minutes for cluster creation**
+
+### Step 1.2: Configure Database Access
+
+1. **Create Database User**
+   - In the left sidebar, click "Database Access"
+   - Click "Add New Database User"
+   - Authentication Method: **Password**
+   - Username: `contentapp` (or your choice)
+   - Password: Click "Autogenerate Secure Password" and **SAVE THIS PASSWORD**
+   - Database User Privileges: **Read and write to any database**
+   - Click "Add User"
+
+### Step 1.3: Configure Network Access
+
+1. **Allow Access from Anywhere** (for Vercel)
+   - In the left sidebar, click "Network Access"
+   - Click "Add IP Address"
+   - Click "Allow Access from Anywhere" (0.0.0.0/0)
+   - Comment: `Vercel Serverless Functions`
+   - Click "Confirm"
+
+**Note:** This is required for Vercel serverless functions. For production, you can restrict to Vercel's IP ranges.
+
+### Step 1.4: Get Connection String
+
+1. **Get Your Connection String**
+   - Go back to "Database" in the left sidebar
+   - Click "Connect" on your cluster
+   - Select "Connect your application"
+   - Driver: **Node.js**
+   - Version: **6.0 or later**
+   - Copy the connection string (looks like):
+     ```
+     mongodb+srv://<username>:<password>@cluster.mongodb.net/?retryWrites=true&w=majority
+     ```
+
+2. **Modify the Connection String**
+   - Replace `<username>` with your database username (e.g., `contentapp`)
+   - Replace `<password>` with the password you saved earlier
+   - Add the database name after `.net/`: `/content_quality_reviewer`
+   
+   **Final format:**
+   ```
+   mongodb+srv://contentapp:YOUR_PASSWORD@cluster.mongodb.net/content_quality_reviewer?retryWrites=true&w=majority
+   ```
+
+**SAVE THIS CONNECTION STRING** - You'll need it for Vercel environment variables.
+
+---
+
+## Part 2: Backend Deployment (Vercel)
+
+### Step 2.1: Install Vercel CLI
+
 ```bash
 npm install -g vercel
 ```
@@ -43,191 +115,180 @@ Verify installation:
 vercel --version
 ```
 
----
-
-## Step 1: Prepare Your Project
-
-### 1.1 Navigate to Project Directory
-
-```bash
-cd E:\AWS
-```
-
-### 1.2 Install Dependencies
-
-```bash
-npm install
-```
-
-You should see output like:
-```
-audited 350 packages in 5s
-found 0 vulnerabilities
-```
-
-### 1.3 Verify Project Structure
-
-Make sure you have these directories:
-```
-E:\AWS\
-├── api/                    # Backend API endpoints
-├── lib/                    # Shared libraries
-├── .kiro/specs/content-quality-reviewer/frontend/  # Frontend
-├── vercel.json            # Vercel configuration
-└── package.json           # Dependencies
-```
-
----
-
-## Step 2: Deploy Backend to Vercel
-
-### 2.1 Login to Vercel
+### Step 2.2: Login to Vercel
 
 ```bash
 vercel login
 ```
 
-This will open your browser. Choose your login method (GitHub, GitLab, Bitbucket, or Email).
+Follow the prompts to authenticate (email verification).
 
-### 2.2 Deploy to Production
+### Step 2.3: Deploy Backend
+
+1. **Navigate to your project root** (where `package.json` is)
+
+2. **Deploy to Vercel:**
+   ```bash
+   vercel
+   ```
+
+3. **Answer the prompts:**
+   - Set up and deploy? **Y**
+   - Which scope? Select your account
+   - Link to existing project? **N**
+   - Project name? `content-quality-reviewer` (or your choice)
+   - In which directory is your code located? **./** (press Enter)
+   - Want to override settings? **N**
+
+4. **Wait for deployment** (1-2 minutes)
+
+5. **Save the deployment URL** (looks like):
+   ```
+   https://content-quality-reviewer-abc123.vercel.app
+   ```
+
+### Step 2.4: Configure Environment Variables
+
+You need to add environment variables to Vercel:
+
+**Option A: Via Vercel Dashboard (Recommended)**
+
+1. Go to [https://vercel.com/dashboard](https://vercel.com/dashboard)
+2. Click on your project (`content-quality-reviewer`)
+3. Go to **Settings** → **Environment Variables**
+4. Add the following variables:
+
+| Name | Value | Environment |
+|------|-------|-------------|
+| `MONGODB_URI` | Your MongoDB connection string from Step 1.4 | Production, Preview, Development |
+| `OPENAI_API_KEY` | Your OpenAI API key | Production, Preview, Development |
+| `JWT_SECRET` | Generate with: `openssl rand -base64 32` | Production, Preview, Development |
+| `MAX_CONTENT_LENGTH` | `2000` | Production, Preview, Development |
+| `RATE_LIMIT_WINDOW` | `60` | Production, Preview, Development |
+| `RATE_LIMIT_MAX` | `10` | Production, Preview, Development |
+| `OPENAI_MODEL` | `gpt-4-turbo-preview` | Production, Preview, Development |
+| `OPENAI_MAX_TOKENS` | `2000` | Production, Preview, Development |
+| `OPENAI_TEMPERATURE` | `0.3` | Production, Preview, Development |
+
+**Option B: Via Vercel CLI**
+
+```bash
+# Set MongoDB URI
+vercel env add MONGODB_URI
+
+# When prompted:
+# - Value: Paste your MongoDB connection string
+# - Environment: Select all (Production, Preview, Development)
+
+# Repeat for each variable above
+vercel env add OPENAI_API_KEY
+vercel env add JWT_SECRET
+# ... etc
+```
+
+### Step 2.5: Redeploy with Environment Variables
+
+After adding environment variables, redeploy:
 
 ```bash
 vercel --prod
 ```
 
-**What happens:**
-1. Vercel CLI will ask questions:
-   - **Set up and deploy?** → Press Enter (Yes)
-   - **Which scope?** → Select your account
-   - **Link to existing project?** → N (No, create new)
-   - **Project name?** → Press Enter (use default) or type a name
-   - **Directory?** → Press Enter (use current directory)
-   - **Override settings?** → N (No)
-
-2. Vercel will:
-   - Upload your code
-   - Build your project
-   - Deploy to production
-   - Give you a URL like: `https://your-project.vercel.app`
-
-**Save this URL!** You'll need it later.
-
-### 2.3 Verify Deployment
-
-Open the URL in your browser. You should see a 404 or blank page (this is normal - the API endpoints don't have a homepage).
-
----
-
-## Step 3: Set Up Vercel KV Database
-
-### 3.1 Go to Vercel Dashboard
-
-1. Open [vercel.com/dashboard](https://vercel.com/dashboard)
-2. Click on your project
-
-### 3.2 Create KV Database
-
-1. Click **Storage** tab (left sidebar)
-2. Click **Create Database**
-3. Select **KV** (Redis)
-4. Enter database name: `content-quality-kv`
-5. Select region: Choose closest to your users (e.g., `us-east-1`)
-6. Click **Create**
-
-### 3.3 Connect Database to Project
-
-1. After creation, you'll see your KV database
-2. Click **Connect Project**
-3. Select your project from the dropdown
-4. Click **Connect**
-
-**Important:** This automatically adds `KV_REST_API_URL` and `KV_REST_API_TOKEN` to your environment variables.
-
----
-
-## Step 4: Configure Environment Variables
-
-### 4.1 Generate JWT Secret
-
-Open terminal and run:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+**Save the production URL** (looks like):
+```
+https://content-quality-reviewer.vercel.app
 ```
 
-Copy the output (it will look like: `a1b2c3d4e5f6...`)
+---
 
-### 4.2 Get OpenAI API Key
+## Part 3: Frontend Setup
 
-1. Go to [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
-2. Click **Create new secret key**
-3. Name it: `content-quality-reviewer`
-4. Copy the key (starts with `sk-`)
-
-**Important:** Save this key somewhere safe - you can't see it again!
-
-### 4.3 Add Environment Variables to Vercel
-
-1. In Vercel Dashboard → Your Project
-2. Click **Settings** tab
-3. Click **Environment Variables** (left sidebar)
-4. Add each variable:
-
-**Variable 1: OPENAI_API_KEY**
-- Key: `OPENAI_API_KEY`
-- Value: `sk-your-openai-key-here` (paste your OpenAI key)
-- Environments: Check all (Production, Preview, Development)
-- Click **Save**
-
-**Variable 2: JWT_SECRET**
-- Key: `JWT_SECRET`
-- Value: (paste the random string you generated)
-- Environments: Check all
-- Click **Save**
-
-**Variable 3: MAX_CONTENT_LENGTH**
-- Key: `MAX_CONTENT_LENGTH`
-- Value: `2000`
-- Environments: Check all
-- Click **Save**
-
-**Variable 4: RATE_LIMIT_WINDOW**
-- Key: `RATE_LIMIT_WINDOW`
-- Value: `60`
-- Environments: Check all
-- Click **Save**
-
-**Variable 5: RATE_LIMIT_MAX**
-- Key: `RATE_LIMIT_MAX`
-- Value: `10`
-- Environments: Check all
-- Click **Save**
-
-### 4.4 Redeploy to Apply Variables
-
-After adding all variables, redeploy:
+### Step 3.1: Navigate to Frontend Directory
 
 ```bash
-vercel --prod
+cd kiro/specs/content-quality-reviewer/frontend
 ```
 
-Or in Vercel Dashboard:
-1. Go to **Deployments** tab
-2. Click **⋯** on latest deployment
-3. Click **Redeploy**
+### Step 3.2: Install Dependencies
+
+```bash
+npm install
+```
+
+### Step 3.3: Configure Frontend Environment
+
+1. **Copy the example environment file:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit `.env` file:**
+   ```bash
+   # Windows
+   notepad .env
+   
+   # Mac/Linux
+   nano .env
+   ```
+
+3. **Set the API endpoint:**
+   ```env
+   VITE_API_ENDPOINT=https://your-backend-url.vercel.app
+   ```
+   
+   Replace `your-backend-url.vercel.app` with your actual Vercel backend URL from Step 2.5.
+
+### Step 3.4: Run Frontend Locally
+
+```bash
+npm run dev
+```
+
+The frontend will start at: `http://localhost:5173`
+
+**Open in browser:** [http://localhost:5173](http://localhost:5173)
+
+### Step 3.5: Deploy Frontend to Vercel (Optional)
+
+If you want to deploy the frontend to Vercel:
+
+1. **From the frontend directory:**
+   ```bash
+   vercel
+   ```
+
+2. **Answer the prompts:**
+   - Set up and deploy? **Y**
+   - Which scope? Select your account
+   - Link to existing project? **N**
+   - Project name? `content-quality-reviewer-frontend`
+   - In which directory is your code located? **./** (press Enter)
+   - Want to override settings? **N**
+
+3. **Add environment variable:**
+   ```bash
+   vercel env add VITE_API_ENDPOINT
+   # Value: Your backend URL from Step 2.5
+   # Environment: Production, Preview, Development
+   ```
+
+4. **Deploy to production:**
+   ```bash
+   vercel --prod
+   ```
 
 ---
 
-## Step 5: Test Backend Deployment
+## Testing & Verification
 
-### 5.1 Test Signup Endpoint
+### Test 1: Backend Health Check
 
-Replace `your-project.vercel.app` with your actual URL:
+Test the signup endpoint:
 
 ```bash
-curl -X POST https://your-project.vercel.app/api/auth/signup \
+curl -X POST https://your-backend-url.vercel.app/api/auth/signup \
   -H "Content-Type: application/json" \
-  -d "{\"email\":\"test@example.com\",\"password\":\"test123\"}"
+  -d '{"email":"test@example.com","password":"testpass123"}'
 ```
 
 **Expected Response:**
@@ -235,337 +296,209 @@ curl -X POST https://your-project.vercel.app/api/auth/signup \
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
-    "id": "some-uuid",
+    "id": "uuid-here",
     "email": "test@example.com"
   }
 }
 ```
 
-**Save the token!** You'll need it for the next test.
-
-### 5.2 Test Login Endpoint
+### Test 2: Login
 
 ```bash
-curl -X POST https://your-project.vercel.app/api/auth/login \
+curl -X POST https://your-backend-url.vercel.app/api/auth/login \
   -H "Content-Type: application/json" \
-  -d "{\"email\":\"test@example.com\",\"password\":\"test123\"}"
-```
-
-**Expected Response:** Same as signup (token + user)
-
-### 5.3 Test Analyze Endpoint
-
-Replace `YOUR_TOKEN` with the token from signup/login:
-
-```bash
-curl -X POST https://your-project.vercel.app/api/analyze \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -d "{\"content\":\"This is a test blog post about technology and innovation.\",\"targetPlatform\":\"blog\",\"contentIntent\":\"inform\"}"
+  -d '{"email":"test@example.com","password":"testpass123"}'
 ```
 
 **Expected Response:**
 ```json
 {
-  "analysisId": "some-uuid",
-  "userId": "user-uuid",
-  "timestamp": "2024-01-01T00:00:00.000Z",
-  "overallScore": 75,
-  "dimensionScores": { ... },
-  "suggestions": [ ... ]
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "uuid-here",
+    "email": "test@example.com"
+  }
 }
 ```
 
-**If all three tests pass, your backend is working! ✅**
-
----
-
-## Step 6: Configure Frontend
-
-### 6.1 Navigate to Frontend Directory
+### Test 3: Content Analysis
 
 ```bash
-cd .kiro/specs/content-quality-reviewer/frontend
+curl -X POST https://your-backend-url.vercel.app/api/analyze \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_FROM_LOGIN" \
+  -d '{
+    "content": "This is a test blog post about AI and technology.",
+    "targetPlatform": "blog",
+    "contentIntent": "informative"
+  }'
 ```
 
-### 6.2 Update Environment Variables
-
-Edit the `.env` file:
-
-```bash
-# Open in your editor (VS Code, Notepad, etc.)
-code .env
-# or
-notepad .env
+**Expected Response:**
+```json
+{
+  "analysisId": "uuid-here",
+  "overallScore": 85,
+  "dimensionScores": {
+    "clarity": 90,
+    "engagement": 80,
+    ...
+  },
+  "suggestions": ["..."],
+  ...
+}
 ```
 
-Replace the content with:
+### Test 4: Frontend Testing
 
-```bash
-VITE_API_ENDPOINT=https://your-project.vercel.app
-```
-
-**Important:** Replace `your-project.vercel.app` with your actual Vercel URL (no trailing slash).
-
-### 6.3 Install Frontend Dependencies
-
-```bash
-npm install
-```
-
----
-
-## Step 7: Run Frontend Locally
-
-### 7.1 Start Development Server
-
-```bash
-npm run dev
-```
-
-You should see:
-```
-  VITE v5.x.x  ready in xxx ms
-
-  ➜  Local:   http://localhost:5173/
-  ➜  Network: use --host to expose
-```
-
-### 7.2 Open in Browser
-
-Open your browser and go to: `http://localhost:5173`
-
-You should see the Content Quality Reviewer landing page.
-
----
-
-## Step 8: Test Complete Application
-
-### 8.1 Test Sign Up
-
-1. Click **Sign Up** button
-2. Enter email: `yourname@example.com`
-3. Enter password: `password123`
-4. Click **Create Account**
-
-**Expected:** You should be redirected to the dashboard.
-
-### 8.2 Test Content Analysis
-
-1. In the dashboard, paste this content:
-   ```
-   Artificial intelligence is transforming how we work and live. 
-   Machine learning algorithms can now process vast amounts of data 
-   to provide insights that were previously impossible to obtain.
-   ```
-
-2. Select:
-   - Platform: **Blog**
-   - Intent: **Inform**
-
-3. Click **Analyze Content**
-
-**Expected:** 
-- Processing screen appears
-- After 5-10 seconds, you see results with:
-  - Overall score
-  - Dimension scores (Structure, Tone, Accessibility, Platform)
-  - Suggestions for improvement
-
-### 8.3 Test History
-
-1. Click **History** in the navigation
-2. You should see your previous analysis
-
-### 8.4 Test Logout and Login
-
-1. Click **Logout**
-2. Click **Login**
-3. Enter your credentials
-4. You should be logged back in
-
-**If all tests pass, your application is fully working! 🎉**
+1. **Open frontend** in browser
+2. **Sign up** with a new account
+3. **Analyze content** - paste some text and click analyze
+4. **View results** - should see scores and suggestions
+5. **Check history** - should see your analysis in history
 
 ---
 
 ## Troubleshooting
 
+### MongoDB Connection Issues
+
+**Error: "MONGODB_URI environment variable is not set"**
+- Solution: Add MONGODB_URI to Vercel environment variables and redeploy
+
+**Error: "Failed to connect to MongoDB"**
+- Check your connection string format
+- Verify username and password are correct
+- Ensure Network Access allows 0.0.0.0/0
+- Check MongoDB Atlas cluster is running
+
+**Error: "Authentication failed"**
+- Verify database user credentials
+- Check password doesn't contain special characters that need URL encoding
+- Try recreating the database user
+
 ### Backend Issues
 
-#### Error: "Environment variable not set"
+**Error: "OpenAI API key not configured"**
+- Add OPENAI_API_KEY to Vercel environment variables
+- Redeploy with `vercel --prod`
 
-**Solution:**
-1. Go to Vercel Dashboard → Settings → Environment Variables
-2. Verify all 5 variables are set
-3. Redeploy: `vercel --prod`
+**Error: "Invalid JWT token"**
+- Ensure JWT_SECRET is set in environment variables
+- Try logging in again to get a fresh token
 
-#### Error: "KV connection error"
-
-**Solution:**
-1. Go to Vercel Dashboard → Storage
-2. Verify KV database is connected to your project
-3. If not, click **Connect Project** and select your project
-
-#### Error: "OpenAI API error"
-
-**Solution:**
-1. Verify your OpenAI API key is correct
-2. Check you have credits: [platform.openai.com/account/billing](https://platform.openai.com/account/billing)
-3. Try generating a new API key
-
-#### Error: "Rate limit exceeded"
-
-**Solution:**
-- Wait 60 seconds and try again
-- Or increase `RATE_LIMIT_MAX` in environment variables
+**Error: 500 Internal Server Error**
+- Check Vercel function logs: `vercel logs`
+- Or in Vercel Dashboard → Project → Deployments → Click deployment → Functions tab
 
 ### Frontend Issues
 
-#### Error: "Failed to fetch" or "Network error"
+**Error: "Network Error" or "Failed to fetch"**
+- Check VITE_API_ENDPOINT in `.env` is correct
+- Verify backend URL is accessible
+- Check browser console for CORS errors
 
-**Solution:**
-1. Check `VITE_API_ENDPOINT` in `.env` is correct
-2. Verify backend is deployed and working (test with curl)
-3. Check browser console for detailed error
+**Error: "Unauthorized"**
+- Token expired - log in again
+- JWT_SECRET mismatch - check backend environment variables
 
-#### Error: "No authentication token"
+**Frontend not loading**
+- Clear browser cache
+- Check browser console for errors
+- Verify `npm run dev` is running without errors
 
-**Solution:**
-- Log out and log back in
-- Clear browser localStorage: Open DevTools → Application → Local Storage → Clear
+### Database Issues
 
-#### Error: CORS errors
+**Collections not created**
+- Collections are created automatically on first insert
+- Check MongoDB Atlas → Database → Browse Collections
 
-**Solution:**
-1. Verify `vercel.json` exists in root directory
-2. Check it has CORS headers configured
-3. Redeploy backend
-
-### Deployment Issues
-
-#### Error: "Command not found: vercel"
-
-**Solution:**
-```bash
-npm install -g vercel
-```
-
-#### Error: "No access to project"
-
-**Solution:**
-1. Run `vercel login` again
-2. Make sure you're logged into the correct account
+**TTL index not working**
+- TTL indexes run every 60 seconds
+- Check indexes: MongoDB Atlas → Database → Browse Collections → analyses → Indexes
+- Should see `createdAt_ttl` index with `expireAfterSeconds: 2592000`
 
 ---
 
 ## Monitoring & Maintenance
 
+### MongoDB Atlas Monitoring
+
+1. **Go to MongoDB Atlas Dashboard**
+2. **Click on your cluster**
+3. **Metrics tab** shows:
+   - Operations per second
+   - Connections
+   - Network traffic
+   - Storage usage
+
+### Vercel Monitoring
+
+1. **Go to Vercel Dashboard**
+2. **Click on your project**
+3. **Analytics tab** shows:
+   - Request count
+   - Response times
+   - Error rates
+   - Bandwidth usage
+
 ### View Logs
 
-**Vercel Dashboard:**
-1. Go to your project
-2. Click **Deployments**
-3. Click on a deployment
-4. Click **Functions** tab
-5. Click on a function to see logs
-
-**Or use CLI:**
+**Vercel Logs (CLI):**
 ```bash
 vercel logs
 ```
 
-### Monitor Usage
+**Vercel Logs (Dashboard):**
+1. Go to project → Deployments
+2. Click on a deployment
+3. Click Functions tab
+4. Click on a function to see logs
 
-**Vercel KV:**
-1. Dashboard → Storage → Your KV database
-2. View commands/day and storage usage
+### Database Maintenance
 
-**OpenAI:**
-1. Go to [platform.openai.com/usage](https://platform.openai.com/usage)
-2. Monitor API usage and costs
+**Check Database Size:**
+- MongoDB Atlas → Database → Cluster → Metrics
+- Free tier: 512 MB storage
 
-### Update Application
-
-When you make code changes:
-
-```bash
-# From root directory
-vercel --prod
+**Monitor Collections:**
+```javascript
+// In MongoDB Atlas → Database → Browse Collections
+// Check document counts:
+// - users: Number of registered users
+// - analyses: Number of analyses (auto-deleted after 30 days)
 ```
 
-Vercel will automatically:
-1. Upload new code
-2. Build
-3. Deploy
-4. Keep old version as backup
+### Cost Monitoring
 
-### Rollback
-
-If something goes wrong:
-
-**Via Dashboard:**
-1. Deployments → Find previous working deployment
-2. Click **⋯** → **Promote to Production**
-
-**Via CLI:**
-```bash
-vercel rollback
-```
-
----
-
-## Production Checklist
-
-Before going live:
-
-- [ ] All environment variables set in Vercel
-- [ ] Vercel KV database connected
-- [ ] Backend tests passing (signup, login, analyze)
-- [ ] Frontend connects to backend
-- [ ] Can sign up new users
-- [ ] Can analyze content
-- [ ] Can view history
-- [ ] Logout/login works
-- [ ] OpenAI API key has sufficient credits
-- [ ] Rate limiting configured appropriately
-- [ ] Monitoring set up (check logs regularly)
-
----
-
-## Cost Estimates
+**MongoDB Atlas (Free Tier):**
+- 512 MB storage
+- Shared RAM
+- Shared vCPU
+- No credit card required
 
 **Vercel (Hobby Plan - Free):**
-- 100 GB-hours of function execution
-- 100 GB bandwidth
+- 100 GB bandwidth/month
+- 100 GB-hours function execution/month
 - Unlimited deployments
 
-**Vercel KV (Hobby Plan - Free):**
-- 256 MB storage
-- 10,000 commands/day
-
 **OpenAI API:**
-- GPT-4 Turbo: ~$0.01 per 1K tokens
-- Estimated: $30-50/month for 1,000 analyses
-
-**Total: ~$30-50/month** (mostly OpenAI costs)
+- Pay per token usage
+- Monitor at: [https://platform.openai.com/usage](https://platform.openai.com/usage)
+- Set usage limits in OpenAI dashboard
 
 ---
 
-## Support
+## Useful Commands
 
-### Check Logs First
-```bash
-vercel logs
-```
-
-### Common Commands
+### Vercel Commands
 
 ```bash
-# Deploy to production
-vercel --prod
-
 # Deploy to preview
 vercel
+
+# Deploy to production
+vercel --prod
 
 # View logs
 vercel logs
@@ -573,35 +506,136 @@ vercel logs
 # List deployments
 vercel ls
 
-# Rollback
-vercel rollback
-
 # Remove deployment
 vercel rm <deployment-url>
+
+# View environment variables
+vercel env ls
+
+# Pull environment variables locally
+vercel env pull
 ```
 
-### Resources
+### MongoDB Commands
 
-- **Vercel Docs:** [vercel.com/docs](https://vercel.com/docs)
-- **Vercel KV Docs:** [vercel.com/docs/storage/vercel-kv](https://vercel.com/docs/storage/vercel-kv)
-- **OpenAI Docs:** [platform.openai.com/docs](https://platform.openai.com/docs)
+**Connect via MongoDB Shell:**
+```bash
+mongosh "mongodb+srv://cluster.mongodb.net/content_quality_reviewer" --username contentapp
+```
 
----
+**Check Collections:**
+```javascript
+show collections
+db.users.countDocuments()
+db.analyses.countDocuments()
+```
 
-## Success! 🎉
-
-Your Content Quality Reviewer is now deployed and running on Vercel!
-
-**Your URLs:**
-- Backend API: `https://your-project.vercel.app`
-- Frontend (local): `http://localhost:5173`
-
-**Next Steps:**
-1. Share with users
-2. Monitor usage and costs
-3. Adjust rate limits as needed
-4. Consider upgrading Vercel plan if you exceed free tier
+**Check Indexes:**
+```javascript
+db.users.getIndexes()
+db.analyses.getIndexes()
+```
 
 ---
 
-**Need help?** Check the logs first, then review the troubleshooting section above.
+## Environment Variables Reference
+
+### Backend (.env or Vercel Environment Variables)
+
+```env
+# MongoDB Configuration
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/content_quality_reviewer?retryWrites=true&w=majority
+
+# OpenAI Configuration
+OPENAI_API_KEY=sk-your-openai-api-key-here
+OPENAI_MODEL=gpt-4-turbo-preview
+OPENAI_MAX_TOKENS=2000
+OPENAI_TEMPERATURE=0.3
+
+# JWT Configuration
+JWT_SECRET=your-secure-random-string-here
+
+# Application Configuration
+MAX_CONTENT_LENGTH=2000
+
+# Rate Limiting Configuration
+RATE_LIMIT_WINDOW=60
+RATE_LIMIT_MAX=10
+```
+
+### Frontend (.env)
+
+```env
+# API Endpoint
+VITE_API_ENDPOINT=https://your-backend-url.vercel.app
+```
+
+---
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                         Frontend                             │
+│              (React + Vite + Tailwind CSS)                  │
+│                  localhost:5173 or Vercel                    │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+                     │ HTTPS API Calls
+                     │
+┌────────────────────▼────────────────────────────────────────┐
+│                    Backend (Vercel)                          │
+│              Serverless Functions (Node.js)                  │
+│  /api/auth/signup, /api/auth/login, /api/analyze, etc.     │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+        ┌────────────┴────────────┐
+        │                         │
+        ▼                         ▼
+┌───────────────┐         ┌──────────────┐
+│  MongoDB      │         │   OpenAI     │
+│   Atlas       │         │     API      │
+│               │         │              │
+│ - users       │         │ GPT-4 Turbo  │
+│ - analyses    │         │              │
+└───────────────┘         └──────────────┘
+```
+
+---
+
+## Next Steps
+
+1. ✅ MongoDB Atlas cluster created and configured
+2. ✅ Backend deployed to Vercel with environment variables
+3. ✅ Frontend running locally or deployed to Vercel
+4. ✅ All endpoints tested and working
+
+**You're all set!** 🎉
+
+### Optional Enhancements
+
+- Set up custom domain in Vercel
+- Configure MongoDB Atlas alerts
+- Set up monitoring with Vercel Analytics
+- Add more content analysis features
+- Implement user profile management
+
+---
+
+## Support
+
+**Issues?**
+- Check the [Troubleshooting](#troubleshooting) section
+- Review Vercel function logs
+- Check MongoDB Atlas metrics
+- Verify all environment variables are set correctly
+
+**Need Help?**
+- Vercel Documentation: [https://vercel.com/docs](https://vercel.com/docs)
+- MongoDB Atlas Documentation: [https://docs.atlas.mongodb.com/](https://docs.atlas.mongodb.com/)
+- OpenAI API Documentation: [https://platform.openai.com/docs](https://platform.openai.com/docs)
+
+---
+
+**Last Updated:** March 2026
+**Version:** 2.0 (MongoDB Migration)
