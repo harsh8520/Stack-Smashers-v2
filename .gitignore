@@ -42,4 +42,6 @@ lerna-debug.log*
 
 # Exclude from GitHub
 docs/
-.kiro/
+.kiro
+
+AWS.zip
