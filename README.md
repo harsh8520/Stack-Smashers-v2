@@ -166,13 +166,9 @@ contentlens-ai/
 - Content calendar integration
 - Public API for third-party integrations
 
-## 📝 License
-
-MIT
-
 ## 👨‍💻 Author
 
-Built for hackathon submission
+Harsh Asoriya
 
 ## 🙏 Acknowledgments
 
