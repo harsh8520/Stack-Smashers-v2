@@ -1,0 +1,306 @@
+{
+  "timestamp": "2026-04-09T05:00:20.802Z",
+  "tests": [
+    {
+      "name": "Twitter - Persuasive",
+      "platform": "twitter",
+      "intent": "persuade",
+      "contentLength": 105,
+      "success": true,
+      "responseTime": 4536,
+      "score": 43,
+      "error": null,
+      "dimensions": {
+        "structure": {
+          "score": 30,
+          "confidence": 0.95,
+          "issues": [
+            {
+              "type": "critical",
+              "category": "structure",
+              "description": "Lack of clear structure - no headings, no paragraphs, and no clear call-to-action.",
+              "suggestion": "Add a clear heading, break the text into paragraphs, and include a call-to-action.",
+              "reasoning": "A clear structure improves readability and engagement."
+            },
+            {
+              "type": "critical",
+              "category": "structure",
+              "description": "The sentence 'Check out our new product! Amazing features await. Buy now and save 50%! Limited time offer!' is a run-on sentence and lacks clarity.",
+              "suggestion": "Break the sentence into multiple clear sentences, each with a specific message.",
+              "reasoning": "Clear sentences improve comprehension and reduce cognitive load."
+            }
+          ],
+          "strengths": [
+            "Brief message"
+          ],
+          "explanation": "The content lacks a clear structure, which makes it hard to read and understand. The message is brief but lacks clarity and a clear call-to-action.",
+          "examples": [
+            {
+              "quote": "Check out our new product! Amazing features await. Buy now and save 50%! Limited time offer!",
+              "issue": "Run-on sentence",
+              "suggestion": "Break into multiple clear sentences."
+            }
+          ]
+        },
+        "tone": {
+          "score": 40,
+          "confidence": 0.9,
+          "issues": [
+            {
+              "type": "important",
+              "category": "tone",
+              "description": "The tone is overly promotional and lacks a personal touch.",
+              "suggestion": "Use a more conversational tone and focus on the benefits of the product.",
+              "reasoning": "A conversational tone improves engagement and trust."
+            }
+          ],
+          "strengths": [
+            "Encourages action"
+          ],
+          "explanation": "The tone is overly promotional, which may come across as insincere. A more conversational tone would improve engagement and trust.",
+          "examples": []
+        },
+        "accessibility": {
+          "score": 50,
+          "confidence": 0.85,
+          "issues": [
+            {
+              "type": "critical",
+              "category": "accessibility",
+              "description": "The language used is simple, but the message is not clear.",
+              "suggestion": "Use clear and concise language to convey the message.",
+              "reasoning": "Clear language improves comprehension and accessibility."
+            }
+          ],
+          "strengths": [
+            "Simple language"
+          ],
+          "explanation": "The language used is simple, but the message is not clear. Clear and concise language would improve comprehension and accessibility.",
+          "examples": []
+        },
+        "platformAlignment": {
+          "score": 50,
+          "confidence": 0.92,
+          "issues": [
+            {
+              "type": "critical",
+              "category": "platform",
+              "description": "The content is not optimized for Twitter - it lacks hashtags and a clear call-to-action.",
+              "suggestion": "Add relevant hashtags and a clear call-to-action to improve engagement.",
+              "reasoning": "Optimizing content for Twitter improves engagement and reach."
+            }
+          ],
+          "strengths": [
+            "Brief message"
+          ],
+          "explanation": "The content is not optimized for Twitter, which may reduce its reach and engagement. Adding relevant hashtags and a clear call-to-action would improve its performance.",
+          "examples": []
+        }
+      }
+    },
+    {
+      "name": "LinkedIn - Informational",
+      "platform": "linkedin",
+      "intent": "inform",
+      "contentLength": 352,
+      "success": true,
+      "responseTime": 16479,
+      "score": 48,
+      "error": null,
+      "dimensions": {
+        "structure": {
+          "score": 48,
+          "confidence": 0.85,
+          "issues": [
+            {
+              "type": "major",
+              "category": "structure",
+              "description": "Lack of clear headings and subheadings",
+              "suggestion": "Add 2-3 H2 headings to break up content",
+              "reasoning": "Headings improve scannability and readability"
+            },
+            {
+              "type": "minor",
+              "category": "structure",
+              "description": "Some sentences are over 25 words",
+              "suggestion": "Break up long sentences into shorter ones",
+              "reasoning": "Shorter sentences improve comprehension"
+            }
+          ],
+          "strengths": [
+            "Clear topic introduction",
+            "Good use of transitional phrases"
+          ],
+          "explanation": "The content has a good structure, but lacks clear headings and has some long sentences. Adding headings and breaking up long sentences will improve readability.",
+          "examples": [
+            {
+              "quote": "Excited to share insights from our latest project on sustainable technology.",
+              "issue": "No heading to introduce the topic",
+              "suggestion": "Add a heading to introduce the topic"
+            }
+          ]
+        },
+        "tone": {
+          "score": 48,
+          "confidence": 0.8,
+          "issues": [
+            {
+              "type": "minor",
+              "category": "tone",
+              "description": "Tone is somewhat formal",
+              "suggestion": "Use a more conversational tone",
+              "reasoning": "Conversational tone improves engagement"
+            }
+          ],
+          "strengths": [
+            "Clear and concise language",
+            "Good use of active voice"
+          ],
+          "explanation": "The tone is somewhat formal, but the language is clear and concise. Using a more conversational tone will improve engagement.",
+          "examples": []
+        },
+        "accessibility": {
+          "score": 48,
+          "confidence": 0.85,
+          "issues": [
+            {
+              "type": "minor",
+              "category": "accessibility",
+              "description": "Some technical terms may be unfamiliar to non-experts",
+              "suggestion": "Define technical terms or provide explanations",
+              "reasoning": "Defining technical terms improves understanding"
+            }
+          ],
+          "strengths": [
+            "Good use of simple language",
+            "Short paragraphs"
+          ],
+          "explanation": "The content is generally accessible, but some technical terms may be unfamiliar to non-experts. Defining technical terms will improve understanding.",
+          "examples": []
+        },
+        "platformAlignment": {
+          "score": 48,
+          "confidence": 0.9,
+          "issues": [
+            {
+              "type": "minor",
+              "category": "platform",
+              "description": "Content is somewhat short for a LinkedIn post",
+              "suggestion": "Add more details or examples",
+              "reasoning": "Longer content improves engagement on LinkedIn"
+            }
+          ],
+          "strengths": [
+            "Good use of relevant keywords",
+            "Clear call-to-action"
+          ],
+          "explanation": "The content is well-aligned with the LinkedIn platform, but is somewhat short. Adding more details or examples will improve engagement.",
+          "examples": []
+        }
+      }
+    },
+    {
+      "name": "Blog - Educational",
+      "platform": "blog",
+      "intent": "educate",
+      "contentLength": 952,
+      "success": true,
+      "responseTime": 7748,
+      "score": 48,
+      "error": null,
+      "dimensions": {
+        "structure": {
+          "score": 40,
+          "confidence": 0.9,
+          "issues": [
+            {
+              "type": "critical",
+              "category": "structure",
+              "description": "No headings, bullets, or lists. Content is a wall of text.",
+              "suggestion": "Add 3-4 clear H2 headings and convert key points to bullet lists",
+              "reasoning": "Unstructured content has 70% higher bounce rates on blogs"
+            },
+            {
+              "type": "critical",
+              "category": "structure",
+              "description": "Sentences average 20+ words - exceeding the 15-20 word optimal range",
+              "suggestion": "Break every sentence over 20 words into 2-3 shorter sentences",
+              "reasoning": "Long sentences reduce comprehension by 60%"
+            }
+          ],
+          "strengths": [
+            "Clear topic focus"
+          ],
+          "explanation": "This content fails structural standards. No headings, no bullets, some long sentences. Requires restructuring.",
+          "examples": [
+            {
+              "quote": "Artificial intelligence is transforming healthcare delivery worldwide.",
+              "issue": "Sentence is 15 words, but could be broken up for better clarity",
+              "suggestion": "Break into 2 sentences: 'Artificial intelligence is transforming healthcare. It is changing delivery worldwide.'"
+            }
+          ]
+        },
+        "tone": {
+          "score": 50,
+          "confidence": 0.85,
+          "issues": [
+            {
+              "type": "important",
+              "category": "tone",
+              "description": "Lacks engaging language and tone",
+              "suggestion": "Use more conversational and engaging tone",
+              "reasoning": "Tone affects reader engagement and sharing"
+            }
+          ],
+          "strengths": [
+            "Informative",
+            "Objective"
+          ],
+          "explanation": "Tone is informative but lacks engagement. Could benefit from more conversational language.",
+          "examples": []
+        },
+        "accessibility": {
+          "score": 50,
+          "confidence": 0.8,
+          "issues": [
+            {
+              "type": "critical",
+              "category": "accessibility",
+              "description": "Flesch-Kincaid grade level is 12+ - requires some college education",
+              "suggestion": "Simplify vocabulary and sentence structure to achieve grade 9-11",
+              "reasoning": "Content should be accessible to 80% of target audience"
+            }
+          ],
+          "strengths": [],
+          "explanation": "Content is somewhat difficult to read. Simplifying language and structure can improve accessibility.",
+          "examples": []
+        },
+        "platformAlignment": {
+          "score": 50,
+          "confidence": 0.9,
+          "issues": [
+            {
+              "type": "critical",
+              "category": "platform",
+              "description": "Missing some blog essentials: no subheadings, limited scannable format",
+              "suggestion": "Add H2/H3 headings, bullet points, and bold key phrases",
+              "reasoning": "Blog readers scan first - this format can improve engagement"
+            }
+          ],
+          "strengths": [
+            "Clear and concise language"
+          ],
+          "explanation": "Content is somewhat aligned with blog format but can improve with additional structural elements.",
+          "examples": []
+        }
+      }
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "successful": 3,
+    "failed": 0,
+    "avgResponseTime": 9587.666666666666,
+    "avgScore": 46.333333333333336
+  }
+}
