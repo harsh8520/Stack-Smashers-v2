@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContentLens AI – UI/UX Case Study</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #1e293b; }
+
+  .slide {
+    width: 1280px;
+    min-height: 720px;
+    margin: 30px auto;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* ── Colour tokens ── */
+  .bg-dark    { background: #0f172a; color: #f1f5f9; }
+  .bg-blue    { background: linear-gradient(135deg,#1e40af,#2563eb); color:#fff; }
+  .bg-white   { background: #ffffff; color: #1e293b; }
+  .bg-slate   { background: #f8fafc; color: #1e293b; }
+  .bg-indigo  { background: linear-gradient(135deg,#312e81,#4338ca); color:#fff; }
+  .bg-teal    { background: linear-gradient(135deg,#0f766e,#0d9488); color:#fff; }
+  .bg-violet  { background: linear-gradient(135deg,#5b21b6,#7c3aed); color:#fff; }
+  .bg-rose    { background: linear-gradient(135deg,#9f1239,#e11d48); color:#fff; }
+  .bg-amber   { background: linear-gradient(135deg,#92400e,#d97706); color:#fff; }
+  .bg-emerald { background: linear-gradient(135deg,#064e3b,#059669); color:#fff; }
+  .bg-sky     { background: linear-gradient(135deg,#0c4a6e,#0284c7); color:#fff; }
+  .bg-gray    { background: linear-gradient(135deg,#1e293b,#334155); color:#fff; }
+
+  /* ── Slide number badge ── */
+  .slide-num {
+    position: absolute; top: 24px; right: 32px;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 2px;
+    opacity: 0.5; text-transform: uppercase;
+  }
+
+  /* ── Slide 1 – Title ── */
+  .title-slide { justify-content: center; align-items: center; text-align: center; padding: 60px; }
+  .title-slide .logo { font-size: 1rem; letter-spacing: 4px; text-transform: uppercase; opacity: 0.7; margin-bottom: 20px; }
+  .title-slide h1 { font-size: 4rem; font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
+  .title-slide h1 span { color: #93c5fd; }
+  .title-slide .tagline { font-size: 1.4rem; opacity: 0.85; margin-bottom: 40px; }
+  .title-slide .divider { width: 80px; height: 4px; background: #93c5fd; border-radius: 2px; margin: 0 auto 40px; }
+  .title-slide .meta { font-size: 1rem; opacity: 0.7; line-height: 2; }
+
+  /* ── Generic layout helpers ── */
+  .slide-body { flex: 1; padding: 50px 60px; }
+  .slide-header { padding: 40px 60px 0; }
+  .slide-header h2 { font-size: 2rem; font-weight: 800; margin-bottom: 6px; }
+  .slide-header .sub { font-size: 1rem; opacity: 0.7; }
+  .accent-line { width: 60px; height: 4px; border-radius: 2px; background: #93c5fd; margin: 12px 0 30px; }
+  .accent-line.dark { background: #2563eb; }
+
+  /* ── Cards ── */
+  .card-grid { display: grid; gap: 20px; }
+  .cols-2 { grid-template-columns: 1fr 1fr; }
+  .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+  .card {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .card.light {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
+  .card p, .card li { font-size: 0.9rem; line-height: 1.7; opacity: 0.9; }
+  .card ul { padding-left: 16px; }
+  .card .icon { font-size: 2rem; margin-bottom: 12px; }
+
+  /* ── Tag / badge ── */
+  .tag {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 0.75rem; font-weight: 700; margin: 3px;
+  }
+  .tag-blue   { background: #dbeafe; color: #1d4ed8; }
+  .tag-green  { background: #d1fae5; color: #065f46; }
+  .tag-purple { background: #ede9fe; color: #5b21b6; }
+  .tag-red    { background: #fee2e2; color: #991b1b; }
+  .tag-amber  { background: #fef3c7; color: #92400e; }
+
+  /* ── Persona ── */
+  .persona-wrap { display: grid; grid-template-columns: 220px 1fr; gap: 30px; }
+  .persona-avatar {
+    background: rgba(255,255,255,0.12);
+    border-radius: 16px; padding: 30px 20px;
+    text-align: center;
+  }
+  .persona-avatar .avatar { font-size: 4rem; margin-bottom: 12px; }
+  .persona-avatar h3 { font-size: 1.1rem; font-weight: 700; }
+  .persona-avatar p { font-size: 0.82rem; opacity: 0.75; margin-top: 6px; }
+  .persona-details { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* ── Empathy map ── */
+  .empathy-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 16px;
+    height: 100%;
+  }
+  .empathy-cell {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .empathy-cell h3 { font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.6; margin-bottom: 10px; }
+  .empathy-cell ul { padding-left: 16px; }
+  .empathy-cell li { font-size: 0.88rem; line-height: 1.8; }
+
+  /* ── Journey ── */
+  .journey-steps { display: flex; align-items: flex-start; gap: 0; margin-top: 10px; }
+  .journey-step { flex: 1; text-align: center; position: relative; }
+  .journey-step:not(:last-child)::after {
+    content: '→';
+    position: absolute; right: -14px; top: 18px;
+    font-size: 1.4rem; color: rgba(255,255,255,0.4);
+  }
+  .journey-step .step-icon {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; margin: 0 auto 12px;
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+  .journey-step h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; }
+  .journey-step p { font-size: 0.75rem; opacity: 0.7; line-height: 1.5; padding: 0 8px; }
+  .journey-step .emotion {
+    margin-top: 10px; font-size: 0.75rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 3px 10px;
+    display: inline-block;
+  }
+
+  /* ── Wireframe ── */
+  .wireframe {
+    background: #f1f5f9;
+    border: 2px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 16px;
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: #475569;
+  }
+  .wf-bar { background: #cbd5e1; height: 10px; border-radius: 4px; margin-bottom: 8px; }
+  .wf-box { background: #e2e8f0; border-radius: 6px; padding: 8px; margin-bottom: 8px; text-align: center; color: #64748b; }
+  .wf-btn { background: #94a3b8; border-radius: 4px; padding: 6px 12px; display: inline-block; color: #fff; font-size: 0.7rem; }
+  .wf-circle { width: 60px; height: 60px; border-radius: 50%; background: #cbd5e1; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+
+  /* ── Colour palette ── */
+  .palette { display: flex; gap: 12px; margin-top: 16px; }
+  .swatch { width: 60px; height: 60px; border-radius: 10px; }
+  .swatch-label { font-size: 0.7rem; text-align: center; margin-top: 4px; opacity: 0.7; }
+
+  /* ── Progress bar ── */
+  .progress-bar { background: rgba(255,255,255,0.15); border-radius: 8px; height: 10px; margin: 6px 0 14px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 8px; background: #93c5fd; }
+
+  /* ── UX principle ── */
+  .ux-principle { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 18px; }
+  .ux-icon { font-size: 1.8rem; flex-shrink: 0; }
+  .ux-text h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+  .ux-text p { font-size: 0.85rem; opacity: 0.8; line-height: 1.5; }
+
+  /* ── Future card ── */
+  .future-card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px; padding: 20px;
+    display: flex; gap: 16px; align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .future-card .num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.9rem; flex-shrink: 0;
+  }
+  .future-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+  .future-card p { font-size: 0.82rem; opacity: 0.75; line-height: 1.5; }
+
+  /* ── Screen mockup ── */
+  .screen-mock {
+    background: #1e293b;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #334155;
+  }
+  .screen-topbar {
+    background: #0f172a;
+    padding: 8px 16px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .screen-body { padding: 16px; }
+
+  /* ── Conclusion ── */
+  .conclusion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .conclusion-item {
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 24px;
+    border-left: 4px solid #93c5fd;
+  }
+  .conclusion-item h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+  .conclusion-item p { font-size: 0.88rem; opacity: 0.85; line-height: 1.7; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 1 – TITLE
+═══════════════════════════════════════════════════════════ -->
+<div class="slide bg-blue title-slide">
+  <div class="slide-num">01 / 14</div>
+  <div class="logo">UI/UX Case Study · 2026</div>
+  <h1>ContentLens <span>AI</span></h1>
+  <div class="tagline">AI-Powered Content Quality Analysis</div>
+  <div class="divider"></div>
+  <div class="meta">
+    Presented by: Stack Smashers Team<br>
+    Subject: Human-Computer Interaction / UI/UX Design<br>
+    Platform: Web Application · React + TypeScript
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 2 – PROBLEM STATEMENT
+═══════════════════════════════════════════════════════════ -->
+<div class="slide bg-rose">
+  <div class="slide-num">02 / 14</div>
+  <div class="slide-header">
+    <h2>Problem Statement</h2>
+    <div class="sub">What challenges do writers face today?</div>
+    <div class="accent-line"></div>
+  </div>
+  <div class="slide-body">
+    <div class="card-grid cols-2" style="gap:20px">
+      <div class="card">
+        <div class="icon">📉</div>
+        <h3>Difficulty Evaluating Quality</h3>
+        <p>Writers have no objective way to measure content quality. Feedback is subjective, inconsistent, and often unavailable before publishing.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🧱</div>
+        <h3>Unclear Structure</h3>
+        <p>Content lacks logical flow, proper headings, and organized sections. Readers bounce quickly from poorly structured articles.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📖</div>
+        <h3>Poor Readability</h3>
+        <p>Complex vocabulary, long sentences, and high grade-level text alienates target audiences and reduces engagement significantly.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📱</div>
+        <h3>Lack of Platform Optimization</h3>
+        <p>Twitter, LinkedIn, and Blog each have unique requirements. Writers manually guess what works — wasting time and missing opportunities.</p>
+      </div>
+    </div>
+    <div style="margin-top:24px; background:rgba(255,255,255,0.1); border-radius:12px; padding:18px; display:flex; align-items:center; gap:16px;">
+      <span style="font-size:2rem;">💡</span>
+      <p style="font-size:0.95rem; line-height:1.6;"><strong>Core Pain Point:</strong> There is no real-time, AI-powered tool that gives writers instant, structured, and actionable feedback tailored to their specific platform and intent.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 3 – SOLUTION OVERVIEW
+═══════════════════════════════════════════════════════════ -->
+<div class="slide bg-teal">
+  <div class="slide-num">03 / 14</div>
+  <div class="slide-header">
+    <h2>Solution Overview</h2>
+    <div class="sub">How ContentLens AI solves the problem</div>
+    <div class="accent-line"></div>
+  </div>
+  <div class="slide-body">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px; align-items:center;">
+      <div>
+        <p style="font-size:1rem; line-height:1.8; margin-bottom:24px; opacity:0.9;">
+          ContentLens AI is an intelligent web platform that uses <strong>Groq LLaMA 3.3 70B</strong> to analyze written content across four quality dimensions and return structured, actionable feedback in seconds.
+        </p>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; align-items:center; gap:14px; background:rgba(255,255,255,0.1); border-radius:10px; padding:14px;">
+            <span style="font-size:1.5rem;">🧠</span>
+            <div><strong>AI-Powered Analysis</strong><br><span style="font-size:0.85rem; opacity:0.8;">Groq LLaMA 3.3 70B processes content and returns dimension scores</span></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:14px; background:rgba(255,255,255,0.1); border-radius:10px; padding:14px;">
+            <span style="font-size:1.5rem;">📊</span>
+            <div><strong>Multi-Dimensional Scoring</strong><br><span style="font-size:0.85rem; opacity:0.8;">Structure · Tone · Accessibility · Platform Alignment</span></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:14px; background:rgba(255,255,255,0.1); border-radius:10px; padding:14px;">
+            <span style="font-size:1.5rem;">✏️</span>
+            <div><strong>Actionable Suggestions</strong><br><span style="font-size:0.85rem; opacity:0.8;">Before/After rewrites, improvement checklist, keyword analysis</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.1); border-radius:16px; padding:30px; text-align:center;">
+        <div style="font-size:3rem; margin-bottom:16px;">🎯</div>
+        <h3 style="font-size:1.3rem; margin-bottom:20px;">One Platform. Four Dimensions.</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:14px;">
+            <div style="font-size:1.5rem;">🏗️</div>
+            <div style="font-size:0.85rem; font-weight:700; margin-top:6px;">Structure</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:14px;">
+            <div style="font-size:1.5rem;">🎭</div>
+            <div style="font-size:0.85rem; font-weight:700; margin-top:6px;">Tone</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:14px;">
+            <div style="font-size:1.5rem;">♿</div>
+            <div style="font-size:0.85rem; font-weight:700; margin-top:6px;">Accessibility</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:14px;">
+            <div style="font-size:1.5rem;">📱</div>
+            <div style="font-size:0.85rem; font-weight:700; margin-top:6px;">Platform Fit</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SLIDE 4 – TARGET USERS
+═══════════════════════════════════════════════════════════ -->
+<div class="slide bg-indigo">
+  <div class="slide-num">04 / 14</div>
+  <div class="slide-header">
+    <h2>Target Users</h2>
+    <div class="sub">Who benefits from ContentLens AI?</div>
+    <div class="accent-line"></div>
+  </div>
+  <div class="slide-body">
+    <div class="card-grid cols-4">
+      <div class="card" style="text-align:center;">
+        <div class="icon">🎓</div>
+        <h3>Students</h3>
+        <p>College and university students writing assignments, essays, and blog posts who want to improve grades and writing quality.</p>
+        <div style="margin-top:14px;">
+          <span class="tag tag-blue">Essays</span>
+          <span class="tag tag-blue">Assignments</span>
+          <span class="tag tag-blue">Reports</span>
+        </div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="icon">✍️</div>
+        <h3>Bloggers</h3>
+        <p>Independent writers publishing on Medium, WordPress, or personal blogs who want higher engagement and readability scores.</p>
+        <div style="margin-top:14px;">
+          <span class="tag tag-green">Blog Posts</span>
+          <span class="tag tag-green">Articles</span>
+          <span class="tag tag-green">Reviews</span>
+        </div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="icon">📢</div>
+        <h3>Content Creators</h3>
+        <p>Social media creators producing content for Twitter, LinkedIn, and Instagram who need platform-specific optimization.</p>
+        <div style="margin-top:14px;">
+          <span class="tag tag-purple">Twitter</span>
+          <span class="tag tag-purple">LinkedIn</span>
+          <span class="tag tag-purple">Instagram</span>
+        </div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="icon">📊</div>
+        <h3>Digital Marketers</h3>
+        <p>Marketing professionals writing copy, campaigns, and brand content who need data-driven quality assurance before publishing.</p>
+        <div style="margin-top:14px;">
+          <span class="tag tag-amber">Campaigns</span>
+          <span class="tag tag-amber">Copy</span>
+          <span class="tag tag-amber">Ads</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:24px; display:flex; gap:20px; justify-content:center;">
+      <div style="background:rgba(255,255,255,0.1); border-radius:10px; padding:14px 24px; text-align:center;">
+        <div style="font-size:1.5rem; font-weight:800;">18–35</div>
+        <div style="font-size:0.8rem; opacity:0.7;">Primary Age Group</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.1); border-radius:10px; padding:14px 24px; text-align:center;">
+        <div style="font-size:1.5rem; font-weight:800;">Web First</div>
+        <div style="font-size:0.8rem; opacity:0.7;">Platform Preference</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.1); border-radius:10px; padding:14px 24px; text-align:center;">
+        <div style="font-size:1.5rem; font-weight:800;">Non-Technical</div>
+        <div style="font-size:0.8rem; opacity:0.7;">User Profile</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.1); border-radius:10px; padding:14px 24px; text-align:center;">
+        <div style="font-size:1.5rem; font-weight:800;">Quality Focused</div>
+        <div style="font-size:0.8rem; opacity:0.7;">Primary Goal</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5 – USER PERSONA -->
+<div class="slide bg-violet">
+  <div class="slide-num">05 / 14</div>
+  <div class="slide-header">
+    <h2>User Persona</h2>
+    <div class="sub">Understanding our primary user</div>
+    <div class="accent-line"></div>
+  </div>
+  <div class="slide-body">
+    <div class="persona-wrap">
+      <div class="persona-avatar">
+        <div class="avatar">👩‍💻</div>
+        <h3>Priya Sharma</h3>
+        <p>Age: 21 · College Student</p>
+        <p style="margin-top:10px;">Computer Science, 3rd Year</p>
+        <p>Aspiring Tech Blogger</p>
+        <div style="margin-top:16px; display:flex; flex-wrap:wrap; gap:6px; justify-content:center;">
+          <span class="tag tag-purple">Blogger</span>
+          <span class="tag tag-blue">Student</span>
+          <span class="tag tag-green">Creator</span>
+        </div>
+      </div>
+      <div class="persona-details">
+        <div class="card">
+          <h3>🎯 Goals</h3>
+          <ul>
+            <li>Improve blog post quality before publishing</li>
+            <li>Get better grades on written assignments</li>
+            <li>Build a professional LinkedIn presence</li>
+            <li>Grow audience through engaging content</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>😤 Frustrations</h3>
+          <ul>
+            <li>No feedback until after publishing</li>
+            <li>Grammarly only checks grammar, not quality</li>
+            <li>Doesn't know if tone matches the platform</li>
+            <li>Spends hours editing with no clear direction</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>💡 Needs</h3>
+          <ul>
+            <li>Instant, objective content quality score</li>
+            <li>Platform-specific writing guidance</li>
+            <li>Simple, visual feedback dashboard</li>
+            <li>Actionable suggestions, not just errors</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>📱 Behaviour Patterns</h3>
+          <ul>
+            <li>Writes on laptop, checks phone frequently</li>
+            <li>Uses Google Docs and Notion for drafts</li>
+            <li>Posts 2–3 times per week on LinkedIn</li>
+            <li>Researches tools before adopting them</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6 – EMPATHY MAP -->
+<div class="slide bg-sky">
+  <div class="slide-num">06 / 14</div>
+  <div class="slide-header">
+    <h2>Empathy Map</h2>
+    <div class="sub">Getting inside the user's head</div>
+    <div class="accent-line"></div>
+  </div>
+  <div class="slide-body" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; height:calc(100% - 20px);">
+    <div class="empathy-cell">
+      <h3>💭 Thinks</h3>
+      <ul>
+        <li>"Is my writing good enough to publish?"</li>
+        <li>"Will my professor think this is well-structured?"</li>
+        <li>"I don't know if this tone is right for LinkedIn"</li>
+        <li>"I wish someone could review this before I post"</li>
+        <li>"Am I using the right keywords?"</li>
+      </ul>
+    </div>
+    <div class="empathy-cell">
+      <h3>❤️ Feels</h3>
+      <ul>
+        <li>Anxious about content quality before publishing</li>
+        <li>Frustrated by lack of structured feedback tools</li>
+        <li>Overwhelmed by too many editing suggestions</li>
+        <li>Motivated to improve and grow as a writer</li>
+        <li>Relieved when content gets positive responses</li>
+      </ul>
+    </div>
+    <div class="empathy-cell">
+      <h3>🗣️ Says</h3>
+      <ul>
+        <li>"I need something faster than manual editing"</li>
+        <li>"Grammarly doesn't tell me if my content is good"</li>
+        <li>"I want to know if this is right for LinkedIn"</li>
+        <li>"Can someone just tell me what to fix?"</li>
+        <li>"I don't have time to rewrite everything"</li>
+      </ul>
+    </div>
+    <div class="empathy-cell">
+      <h3>🏃 Does</h3>
+      <ul>
+        <li>Writes drafts in Google Docs, then edits manually</li>
+        <li>Asks friends to review content before posting</li>
+        <li>Searches "how to write better LinkedIn posts"</li>
+        <li>Compares engagement on different post styles</li>
+        <li>Uses Grammarly for grammar but not quality</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7 – USER JOURNEY -->
+<div class="slide bg-amber">
+  <div class="slide-num">07 / 14</div>
+  <div class="slide-header">
+    <h2>User Journey Map</h2>
+    <div class="sub">From content creation to improvement</div>
+    <div class="accent-line"></div>
+  </div>
+  <div class="slide-body">
+    <div class="journey-steps">
+      <div class="journey-step">
+        <div class="step-icon">✍️</div>
+        <h4>Write Content</h4>
+        <p>User writes blog post, assignment, or social media content in their preferred tool</p>
+        <div class="emotion">😐 Uncertain</div>
+      </div>
+      <div class="journey-step">
+        <div class="step-icon">📋</div>
+        <h4>Paste in Editor</h4>
+        <p>User copies content and pastes it into the ContentLens AI text editor</p>
+        <div class="emotion">🤔 Curious</div>
+      </div>
+      <div class="journey-step">
+        <div class="step-icon">🎯</div>
+        <h4>Select Platform</h4>
+        <p>User selects target platform: Twitter, LinkedIn, Blog, or Medium</p>
+        <div class="emotion">😊 Engaged</div>
+      </div>
+      <div class="journey-step">
+        <div class="step-icon">🔍</div>
+        <h4>Select Intent</h4>
+        <p>User selects content intent: Inform, Educate, or Persuade</p>
+        <div class="emotion">😊 Focused</div>
+      </div>
+      <div class="journey-step">
+        <div class="step-icon">🚀</div>
+        <h4>Click Analyze</h4>
+        <p>AI processes content across 4 dimensions in 4–6 seconds</p>
+        <div class="emotion">⏳ Anticipating</div>
+      </div>
+      <div class="journey-step">
+        <div class="step-icon">📊</div>
+        <h4>View Feedback</h4>
+        <p>User sees overall score, dimension breakdown, and detailed suggestions</p>
+        <div class="emotion">😮 Surprised</div>
+      </div>
+      <div class="journey-step">
+        <div class="step-icon">✅</div>
+        <h4>Improve Content</h4>
+        <p>User applies suggestions, re-analyzes, and publishes improved content</p>
+        <div class="emotion">😄 Satisfied</div>
+      </div>
+    </div>
+    <div style="margin-top:30px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+      <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:16px;">
+        <h4 style="font-size:0.85rem; margin-bottom:8px;">🔴 Pain Points</h4>
+        <p style="font-size:0.8rem; opacity:0.85; line-height:1.6;">Waiting for analysis · Understanding scores · Knowing what to fix first</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:16px;">
+        <h4 style="font-size:0.85rem; margin-bottom:8px;">🟡 Opportunities</h4>
+        <p style="font-size:0.8rem; opacity:0.85; line-height:1.6;">Real-time preview · Progress indicators · Priority-ranked suggestions</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.15); border-radius:10px; padding:16px;">
+        <h4 style="font-size:0.85rem; margin-bottom:8px;">🟢 Moments of Delight</h4>
+        <p style="font-size:0.8rem; opacity:0.85; line-height:1.6;">Seeing score improve · Before/After rewrites · Checklist completion</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8 – WIREFRAMES -->
+<div class="slide bg-white">
+  <div class="slide-num" style="color:#64748b;">08 / 14</div>
+  <div class="slide-header">
+    <h2 style="color:#1e293b;">Wireframes</h2>
+    <div class="sub" style="color:#64748b;">Low-fidelity layout decisions</div>
+    <div class="accent-line dark"></div>
+  </div>
+  <div class="slide-body">
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;">
+      <div>
+        <div style="font-size:0.8rem; font-weight:700; color:#2563eb; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Home Page</div>
+        <div class="wireframe">
+          <div class="wf-bar" style="width:40%; background:#94a3b8;"></div>
+          <div class="wf-box" style="height:80px; display:flex; align-items:center; justify-content:center;">Hero Banner<br>Tagline + CTA</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
+            <div class="wf-box" style="height:50px; font-size:0.65rem;">Feature 1</div>
+            <div class="wf-box" style="height:50px; font-size:0.65rem;">Feature 2</div>
+          </div>
+          <div style="text-align:center;"><div class="wf-btn">Get Started →</div></div>
+        </div>
+        <p style="font-size:0.78rem; color:#64748b; margin-top:10px; line-height:1.5;">Clear hero section with single CTA. Features grid below fold. Minimal navigation.</p>
+      </div>
+      <div>
+        <div style="font-size:0.8rem; font-weight:700; color:#2563eb; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Content Input Page</div>
+        <div class="wireframe">
+          <div class="wf-bar" style="width:60%;"></div>
+          <div class="wf-box" style="height:100px; font-size:0.7rem;">Large Text Area<br>Paste content here...</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
+            <div class="wf-box" style="font-size:0.65rem;">Platform ▼</div>
+            <div class="wf-box" style="font-size:0.65rem;">Intent ▼</div>
+          </div>
+          <div style="text-align:center;"><div class="wf-btn" style="background:#2563eb;">Analyze Content</div></div>
+        </div>
+        <p style="font-size:0.78rem; color:#64748b; margin-top:10px; line-height:1.5;">Large editor dominates screen. Dropdowns for platform/intent. Single prominent action button.</p>
+      </div>
+      <div>
+        <div style="font-size:0.8rem; font-weight:700; color:#2563eb; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Results Dashboard</div>
+        <div class="wireframe">
+          <div class="wf-bar" style="width:50%;"></div>
+          <div style="display:flex; gap:6px; margin-bottom:8px;">
+            <div class="wf-circle" style="width:50px; height:50px; font-size:0.7rem;">Score</div>
+            <div style="flex:1;">
+              <div class="wf-box" style="height:20px; font-size:0.6rem; margin-bottom:4px;">Structure ████░</div>
+              <div class="wf-box" style="height:20px; font-size:0.6rem; margin-bottom:4px;">Tone ███░░</div>
+              <div class="wf-box" style="height:20px; font-size:0.6rem;">Platform ████░</div>
+            </div>
+          </div>
+          <div class="wf-box" style="height:40px; font-size:0.65rem;">Suggestions Panel</div>
+        </div>
+        <p style="font-size:0.78rem; color:#64748b; margin-top:10px; line-height:1.5;">Score circle on left. Dimension bars on right. Suggestions below. Scannable layout.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 9 – PROTOTYPE -->
+<div class="slide bg-emerald">
+  <div class="slide-num">09 / 14</div>
+  <div class="slide-header">
+    <h2>Prototype</h2>
+    <div class="sub">Simulating real interaction before development</div>
+    <div class="accent-line"></div>
+  </div>
+  <div class="slide-body">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px; align-items:start;">
+      <div>
+        <p style="font-size:0.95rem; line-height:1.8; margin-bottom:20px; opacity:0.9;">The prototype bridges wireframes and final development by simulating real user interactions. It validates design decisions before writing a single line of production code.</p>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div class="card">
+            <h3>📐 Lo-Fi Prototype</h3>
+            <p>Paper sketches and Figma wireframes. Tests navigation flow and layout decisions. Used for early stakeholder feedback.</p>
+          </div>
+          <div class="card">
+            <h3>🎨 Hi-Fi Prototype</h3>
+            <p>Clickable Figma prototype with real colors, typography, and interactions. Simulates the full user journey end-to-end.</p>
+          </div>
+          <div class="card">
+            <h3>🚀 Live Prototype</h3>
+            <p>Deployed React application at contentlens-backend.onrender.com. Real AI responses, real data, real user testing.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="background:rgba(255,255,255,0.1); border-radius:16px; padding:24px;">
+          <h3 style="margin-bottom:16px; font-size:1rem;">Prototype Interaction Flow</h3>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.1); border-radius:8px; padding:12px;">
+              <span style="background:rgba(255,255,255,0.2); width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.8rem; flex-shrink:0;">1</span>
+              <span style="font-size:0.88rem;">User lands on homepage → clicks "Get Started"</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.1); border-radius:8px; padding:12px;">
+              <span style="background:rgba(255,255,255,0.2); width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.8rem; flex-shrink:0;">2</span>
+              <span style="font-size:0.88rem;">Sign up / Login → redirected to Dashboard</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.1); border-radius:8px; padding:12px;">
+              <span style="background:rgba(255,255,255,0.2); width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.8rem; flex-shrink:0;">3</span>
+              <span style="font-size:0.88rem;">Paste content → select platform + intent</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.1); border-radius:8px; padding:12px;">
+              <span style="background:rgba(255,255,255,0.2); width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.8rem; flex-shrink:0;">4</span>
+              <span style="font-size:0.88rem;">Click Analyze → loading animation plays</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.1); border-radius:8px; padding:12px;">
+              <span style="background:rgba(255,255,255,0.2); width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.8rem; flex-shrink:0;">5</span>
+              <span style="font-size:0.88rem;">Results dashboard renders with scores + feedback</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.1); border-radius:8px; padding:12px;">
+              <span style="background:rgba(255,255,255,0.2); width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.8rem; flex-shrink:0;">6</span>
+              <span style="font-size:0.88rem;">User edits content → re-analyzes → sees improvement</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10 – UI DESIGN -->
+<div class="slide bg-white">
+  <div class="slide-num" style="color:#64748b;">10 / 14</div>
+  <div class="slide-header">
+    <h2 style="color:#1e293b;">UI Design System</h2>
+    <div class="sub" style="color:#64748b;">Visual design choices and principles</div>
+    <div class="accent-line dark"></div>
+  </div>
+  <div class="slide-body">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">
+      <div>
+        <h3 style="color:#2563eb; margin-bottom:16px; font-size:1rem; text-transform:uppercase; letter-spacing:1px;">Color Palette</h3>
+        <div class="palette">
+          <div><div class="swatch" style="background:#2563EB;"></div><div class="swatch-label" style="color:#64748b;">Primary Blue</div></div>
+          <div><div class="swatch" style="background:#1d4ed8;"></div><div class="swatch-label" style="color:#64748b;">Dark Blue</div></div>
+          <div><div class="swatch" style="background:#10b981;"></div><div class="swatch-label" style="color:#64748b;">Success</div></div>
+          <div><div class="swatch" style="background:#f59e0b;"></div><div class="swatch-label" style="color:#64748b;">Warning</div></div>
+          <div><div class="swatch" style="background:#ef4444;"></div><div class="swatch-label" style="color:#64748b;">Error</div></div>
+          <div><div class="swatch" style="background:#F8FAFC;"></div><div class="swatch-label" style="color:#64748b;">Background</div></div>
+        </div>
+        <h3 style="color:#2563eb; margin:24px 0 12px; font-size:1rem; text-transform:uppercase; letter-spacing:1px;">Typography</h3>
+        <div style="background:#f8fafc; border-radius:10px; padding:16px;">
+          <div style="font-size:1.8rem; font-weight:800; color:#1e293b; margin-bottom:6px;">Heading Bold 800</div>
+          <div style="font-size:1.1rem; font-weight:600; color:#1e293b; margin-bottom:6px;">Subheading Semibold 600</div>
+          <div style="font-size:0.9rem; color:#64748b; line-height:1.7;">Body text Regular 400 — Clear, readable, 16px base size for comfortable reading across all screen sizes.</div>
+        </div>
+      </div>
+      <div>
+        <h3 style="color:#2563eb; margin-bottom:16px; font-size:1rem; text-transform:uppercase; letter-spacing:1px;">Layout Hierarchy</h3>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="background:#2563eb; color:white; border-radius:8px; padding:12px 16px; font-weight:700; font-size:0.9rem;">Navigation Bar — Fixed top, minimal links</div>
+          <div style="background:#dbeafe; border-radius:8px; padding:12px 16px; font-weight:600; font-size:0.9rem; color:#1e40af;">Hero / Score Section — Primary focus area</div>
+          <div style="background:#eff6ff; border-radius:8px; padding:12px 16px; font-size:0.9rem; color:#1e40af;">Dimension Cards — 2-column grid layout</div>
+          <div style="background:#f0fdf4; border-radius:8px; padding:12px 16px; font-size:0.9rem; color:#065f46;">Feedback Panels — Strengths + Improvements</div>
+          <div style="background:#f8fafc; border-radius:8px; padding:12px 16px; font-size:0.85rem; color:#64748b; border:1px solid #e2e8f0;">Detailed Analysis — Expandable sections</div>
+        </div>
+        <div style="margin-top:16px; background:#f8fafc; border-radius:10px; padding:14px; border:1px solid #e2e8f0;">
+          <p style="font-size:0.82rem; color:#64748b; line-height:1.6;"><strong style="color:#2563eb;">Design Principle:</strong> F-pattern reading layout. Most important information (score) top-left. Progressive disclosure for detailed feedback. White space prevents cognitive overload.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 11 – KEY INTERFACE SCREENS -->
+<div class="slide bg-gray">
+  <div class="slide-num">11 / 14</div>
+  <div class="slide-header">
+    <h2>Key Interface Screens</h2>
+    <div class="sub">Main screens of the application</div>
+    <div class="accent-line"></div>
+  </div>
+  <div class="slide-body">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+      <div>
+        <div style="font-size:0.75rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; opacity:0.6; margin-bottom:10px;">Screen 1 — Content Input Editor</div>
+        <div class="screen-mock">
+          <div class="screen-topbar">
+            <div class="dot" style="background:#ef4444;"></div>
+            <div class="dot" style="background:#f59e0b;"></div>
+            <div class="dot" style="background:#10b981;"></div>
+            <span style="font-size:0.7rem; opacity:0.5; margin-left:8px;">ContentLens AI — Dashboard</span>
+          </div>
+          <div class="screen-body">
+            <div style="background:#1e293b; border:1px solid #334155; border-radius:6px; padding:12px; margin-bottom:10px; min-height:80px;">
+              <p style="font-size:0.72rem; color:#94a3b8; line-height:1.6;">Paste your content here...<br><span style="color:#64748b;">|</span></p>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+              <div style="background:#334155; border-radius:6px; padding:8px; font-size:0.7rem; color:#94a3b8;">Platform: LinkedIn ▼</div>
+              <div style="background:#334155; border-radius:6px; padding:8px; font-size:0.7rem; color:#94a3b8;">Intent: Inform ▼</div>
+            </div>
+            <div style="background:#2563eb; border-radius:6px; padding:8px; text-align:center; font-size:0.75rem; font-weight:700;">🚀 Analyze Content</div>
+          </div>
+        </div>
+        <p style="font-size:0.78rem; opacity:0.7; margin-top:8px; line-height:1.5;">Large textarea dominates. Dropdowns below. Single CTA button. Word count indicator.</p>
+      </div>
+      <div>
+        <div style="font-size:0.75rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; opacity:0.6; margin-bottom:10px;">Screen 2 — Analysis Results Dashboard</div>
+        <div class="screen-mock">
+          <div class="screen-topbar">
+            <div class="dot" style="background:#ef4444;"></div>
+            <div class="dot" style="background:#f59e0b;"></div>
+            <div class="dot" style="background:#10b981;"></div>
+            <span style="font-size:0.7rem; opacity:0.5; margin-left:8px;">ContentLens AI — Results</span>
+          </div>
+          <div class="screen-body">
+            <div style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+              <div style="width:50px; height:50px; border-radius:50%; border:3px solid #2563eb; display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:800; color:#2563eb; flex-shrink:0;">82</div>
+              <div style="flex:1;">
+                <div style="font-size:0.65rem; color:#94a3b8; margin-bottom:4px;">Structure</div>
+                <div style="background:#334155; border-radius:4px; height:6px; margin-bottom:4px;"><div style="background:#2563eb; width:70%; height:100%; border-radius:4px;"></div></div>
+                <div style="font-size:0.65rem; color:#94a3b8; margin-bottom:4px;">Tone</div>
+                <div style="background:#334155; border-radius:4px; height:6px;"><div style="background:#10b981; width:85%; height:100%; border-radius:4px;"></div></div>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+              <div style="background:#064e3b; border-radius:6px; padding:8px; font-size:0.65rem; color:#6ee7b7;">✓ Strengths (3)</div>
+              <div style="background:#7f1d1d; border-radius:6px; padding:8px; font-size:0.65rem; color:#fca5a5;">⚠ Issues (4)</div>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:0.78rem; opacity:0.7; margin-top:8px; line-height:1.5;">Score circle + dimension bars. Color-coded feedback panels. Expandable detail sections.</p>
+      </div>
+    </div>
+    <div style="margin-top:20px; display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+      <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:16px;">
+        <h4 style="font-size:0.85rem; margin-bottom:8px;">⏳ Loading Screen</h4>
+        <p style="font-size:0.8rem; opacity:0.75; line-height:1.5;">Animated progress indicator with step-by-step analysis status. Reduces perceived wait time. Shows "Analyzing Structure... Checking Tone..." messages.</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.08); border-radius:10px; padding:16px;">
+        <h4 style="font-size:0.85rem; margin-bottom:8px;">💡 Suggestions Panel</h4>
+        <p style="font-size:0.8rem; opacity:0.75; line-height:1.5;">Before/After rewrite examples. Priority-ranked improvement checklist. Expandable detail cards with specific quotes from the user's content.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 12 – USABILITY CONSIDERATIONS -->
+<div class="slide bg-blue">
+  <div class="slide-num">12 / 14</div>
+  <div class="slide-header">
+    <h2>Usability Considerations</h2>
+    <div class="sub">UX principles applied in ContentLens AI</div>
+    <div class="accent-line"></div>
+  </div>
+  <div class="slide-body">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">
+      <div>
+        <div class="ux-principle">
+          <div class="ux-icon">🎯</div>
+          <div class="ux-text">
+            <h4>Simplicity (Nielsen's Heuristic #8)</h4>
+            <p>Minimal UI with only essential elements visible. No clutter. Single action per screen. Users focus on content, not the interface.</p>
+          </div>
+        </div>
+        <div class="ux-principle">
+          <div class="ux-icon">🔍</div>
+          <div class="ux-text">
+            <h4>Clarity (Gestalt Principles)</h4>
+            <p>Clear visual hierarchy using size, color, and spacing. Score is the largest element. Feedback is grouped by category. Labels are always visible.</p>
+          </div>
+        </div>
+        <div class="ux-principle">
+          <div class="ux-icon">⚡</div>
+          <div class="ux-text">
+            <h4>Fast Feedback (Response Time)</h4>
+            <p>Analysis completes in 4–6 seconds. Loading animation provides progress feedback. Results render progressively, not all at once.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="ux-principle">
+          <div class="ux-icon">📊</div>
+          <div class="ux-text">
+            <h4>Readable Visual Scoring</h4>
+            <p>Circular score gauge for overall score. Progress bars for dimensions. Color coding: green (good), amber (fair), red (poor). No ambiguity.</p>
+          </div>
+        </div>
+        <div class="ux-principle">
+          <div class="ux-icon">✅</div>
+          <div class="ux-text">
+            <h4>Actionable Insights (Don Norman)</h4>
+            <p>Every issue includes a specific suggestion. Before/After rewrites show exactly what to change. Improvement checklist tracks progress.</p>
+          </div>
+        </div>
+        <div class="ux-principle">
+          <div class="ux-icon">♿</div>
+          <div class="ux-text">
+            <h4>Accessibility (WCAG Guidelines)</h4>
+            <p>High contrast color ratios. Keyboard navigable. Screen reader compatible labels. Responsive layout for different screen sizes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 13 – FUTURE UX IMPROVEMENTS -->
+<div class="slide bg-violet">
+  <div class="slide-num">13 / 14</div>
+  <div class="slide-header">
+    <h2>Future UX Improvements</h2>
+    <div class="sub">Roadmap for enhanced user experience</div>
+    <div class="accent-line"></div>
+  </div>
+  <div class="slide-body">
+    <div class="future-card">
+      <div class="num">1</div>
+      <div>
+        <h4>Real-Time Writing Feedback</h4>
+        <p>Analyze content as the user types — similar to Grammarly. Show live score updates, highlight problematic sentences inline, and suggest improvements without requiring a manual submit action.</p>
+      </div>
+    </div>
+    <div class="future-card">
+      <div class="num">2</div>
+      <div>
+        <h4>AI Writing Assistant</h4>
+        <p>Integrated AI chat panel that helps users rewrite specific sections. User selects a paragraph, asks "make this more professional" and the AI rewrites it in-place with one click.</p>
+      </div>
+    </div>
+    <div class="future-card">
+      <div class="num">3</div>
+      <div>
+        <h4>Collaboration Features</h4>
+        <p>Multi-user editing with shared analysis results. Team members can comment on specific feedback items, assign improvements, and track content quality over time as a team.</p>
+      </div>
+    </div>
+    <div class="future-card">
+      <div class="num">4</div>
+      <div>
+        <h4>Mobile Interface</h4>
+        <p>Native mobile app (React Native) for on-the-go content analysis. Optimized touch interface, voice-to-text input, and push notifications for analysis completion.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 14 – CONCLUSION -->
+<div class="slide bg-dark">
+  <div class="slide-num">14 / 14</div>
+  <div class="slide-header">
+    <h2 style="color:#f1f5f9;">Conclusion</h2>
+    <div class="sub" style="color:#94a3b8;">Design approach and impact summary</div>
+    <div class="accent-line"></div>
+  </div>
+  <div class="slide-body">
+    <div class="conclusion-grid">
+      <div class="conclusion-item">
+        <h3>🎯 Design Approach</h3>
+        <p>ContentLens AI follows a user-centered design process — from empathy mapping and persona creation to wireframing and live prototyping. Every design decision prioritizes simplicity, clarity, and actionable feedback over feature complexity.</p>
+      </div>
+      <div class="conclusion-item">
+        <h3>👥 User Impact</h3>
+        <p>Students, bloggers, and content creators can now get objective, AI-powered feedback in under 6 seconds. The interface removes the guesswork from content quality and replaces it with data-driven, structured improvement guidance.</p>
+      </div>
+      <div class="conclusion-item">
+        <h3>🏗️ Technical Achievement</h3>
+        <p>Built with React + TypeScript frontend, Node.js backend, and Groq LLaMA 3.3 70B AI model. Deployed on Vercel + Render with MongoDB Atlas. 100% test success rate. Production-ready at zero monthly cost.</p>
+      </div>
+      <div class="conclusion-item">
+        <h3>🚀 Future Vision</h3>
+        <p>Real-time feedback, AI writing assistant, mobile app, and team collaboration features will transform ContentLens AI from a quality checker into a complete content intelligence platform for professional creators.</p>
+      </div>
+    </div>
+    <div style="margin-top:24px; text-align:center; background:linear-gradient(135deg,#1e40af,#2563eb); border-radius:16px; padding:24px;">
+      <div style="font-size:1.5rem; font-weight:800; color:#fff; margin-bottom:8px;">ContentLens AI</div>
+      <div style="font-size:0.95rem; color:#93c5fd; margin-bottom:16px;">AI-Powered Content Quality Analysis · Built by Stack Smashers</div>
+      <div style="display:flex; justify-content:center; gap:30px;">
+        <div style="text-align:center;">
+          <div style="font-size:1.3rem; font-weight:800; color:#fff;">100%</div>
+          <div style="font-size:0.75rem; color:#93c5fd;">API Success Rate</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:1.3rem; font-weight:800; color:#fff;">4 Dims</div>
+          <div style="font-size:0.75rem; color:#93c5fd;">Analysis Depth</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:1.3rem; font-weight:800; color:#fff;">5s</div>
+          <div style="font-size:0.75rem; color:#93c5fd;">Avg Response</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:1.3rem; font-weight:800; color:#fff;">$0</div>
+          <div style="font-size:0.75rem; color:#93c5fd;">Monthly Cost</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -25,6 +25,10 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.21.0",
     "sentiment": "^5.0.2",
-    "uuid": "^11.0.3"
+    "uuid": "^11.0.3",
+    "zip": "^1.2.0"
+  },
+  "devDependencies": {
+    "axios": "^1.13.6"
   }
 }

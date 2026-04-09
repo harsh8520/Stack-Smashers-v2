@@ -6,9 +6,8 @@ An intelligent content quality analysis platform powered by AI and NLP that help
 
 - **Multi-Platform Optimization**: Tailored analysis for Blog, LinkedIn, Twitter, and Medium
 - **AI-Powered Insights**: Uses Groq's LLaMA 3.1 70B for deep content analysis
-- **Comprehensive Scoring**: Multi-dimensional analysis (Clarity, Structure, Tone, Engagement, SEO)
+- **Comprehensive Scoring**: Multi-dimensional analysis (Clarity, Structure, Tone, Engagement)
 - **Readability Metrics**: Flesch Reading Ease, Grade Level, and more
-- **Keyword Analysis**: SEO-focused keyword extraction and density analysis
 - **Real-Time Processing**: Get results in under 2 seconds
 - **User Authentication**: Secure JWT-based auth with MongoDB
 - **Analysis History**: Track and review past analyses
@@ -31,7 +30,6 @@ An intelligent content quality analysis platform powered by AI and NLP that help
 ### NLP & Analysis
 - Sentiment analysis
 - Readability calculations (Flesch-Kincaid, SMOG, etc.)
-- Keyword extraction with TF-IDF
 - Custom analyzers for structure, tone, and accessibility
 
 ## 📦 Installation

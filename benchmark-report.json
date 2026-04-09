@@ -1,0 +1,83 @@
+{
+  "timestamp": "2026-03-08T17:45:00.854Z",
+  "configuration": {
+    "apiEndpoint": "https://contentlens-backend.onrender.com",
+    "iterations": 3,
+    "totalTests": 9
+  },
+  "metrics": {
+    "successRate": "0.0%",
+    "analysisAccuracy": "NaN%",
+    "responseTime": null,
+    "errors": 9
+  },
+  "rawData": {
+    "responseTimes": [],
+    "analysisAccuracy": [],
+    "errors": [
+      {
+        "success": false,
+        "responseTime": 507,
+        "error": "Request failed with status code 429",
+        "iteration": 1,
+        "sampleType": "twitter"
+      },
+      {
+        "success": false,
+        "responseTime": 505,
+        "error": "Request failed with status code 429",
+        "iteration": 2,
+        "sampleType": "twitter"
+      },
+      {
+        "success": false,
+        "responseTime": 492,
+        "error": "Request failed with status code 429",
+        "iteration": 3,
+        "sampleType": "twitter"
+      },
+      {
+        "success": false,
+        "responseTime": 1044,
+        "error": "Request failed with status code 429",
+        "iteration": 1,
+        "sampleType": "linkedin"
+      },
+      {
+        "success": false,
+        "responseTime": 491,
+        "error": "Request failed with status code 429",
+        "iteration": 2,
+        "sampleType": "linkedin"
+      },
+      {
+        "success": false,
+        "responseTime": 496,
+        "error": "Request failed with status code 429",
+        "iteration": 3,
+        "sampleType": "linkedin"
+      },
+      {
+        "success": false,
+        "responseTime": 489,
+        "error": "Request failed with status code 429",
+        "iteration": 1,
+        "sampleType": "blog"
+      },
+      {
+        "success": false,
+        "responseTime": 505,
+        "error": "Request failed with status code 429",
+        "iteration": 2,
+        "sampleType": "blog"
+      },
+      {
+        "success": false,
+        "responseTime": 492,
+        "error": "Request failed with status code 429",
+        "iteration": 3,
+        "sampleType": "blog"
+      }
+    ]
+  }
+}

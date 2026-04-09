@@ -90,12 +90,6 @@ export default function Login({ onNavigate, onAuthSuccess }: LoginProps) {
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="rounded border-[#E5E7EB]" />
-                <span className="text-gray-600">Remember me</span>
-              </label>
-            </div>
 
             <button
               type="submit"
